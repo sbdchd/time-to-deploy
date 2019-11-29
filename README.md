@@ -1,16 +1,20 @@
 # time to deploy
 
-> slack bot for reminding about heroku deployments
-
-This is similar to setting up a `/remind`er in Slack but provides additional
-information such as the diff between staging and production. The current
-commit on production and when the code was last deployed. As well as if the
-last deploy was a rollback.
+> Slack bot for reminding about Heroku deployments
 
 ## Why
 
-Using a `/remind` works in slack but info is lacking. The Heroku dashboard
+Using a `/remind` works in Slack but info is lacking. The Heroku dashboard
 also doesn't show a diff between prod and staging when there was a rollback.
+
+This Slack bot provides info about Heroku deployments include:
+
+- diff between staging and production
+- current commit on production
+- when code was last deployed to production
+- info on whether the last deploy was a rollback
+- promotion button from staging to prod
+- links to staging and production envs
 
 ## Setup Up
 
@@ -34,7 +38,7 @@ also doesn't show a diff between prod and staging when there was a rollback.
 
 ### Deployment
 
-1. Log into the AWS consule and navigate to <https://console.aws.amazon.com/lambda/#/functions>
+1. Log into the AWS console and navigate to <https://console.aws.amazon.com/lambda/#/functions>
 
 2. Press the "Create function" button in the upper right hand corner.
 
@@ -54,7 +58,7 @@ also doesn't show a diff between prod and staging when there was a rollback.
    vars according to the `.env-example` file located in this repo. Use the
    previous OAuth Acess Token that starts with `xoxp-` as the
    `TTD_SLACK_API_TOKEN`. For the `TTD_SLACK_CHANNEL_ID` you'll want to get the
-   channel ID from the slack URL. Don't forget to save your changes.
+   channel ID from the Slack URL. Don't forget to save your changes.
 
 8. Now we need to update our function with the actual code. Run `s/build` and
    `s/deploy`. If you didn't name your lambda function `time-to-deploy`, be
