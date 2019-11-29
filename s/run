@@ -1,0 +1,10 @@
+#!/bin/sh
+set -o errexit
+set -o nounset
+
+
+main() {
+    aws lambda invoke --function-name time-to-deploy out.log
+}
+
+main "$@"

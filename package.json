@@ -1,0 +1,30 @@
+{
+  "name": "time-to-deploy",
+  "version": "0.0.1",
+  "main": "main.ts",
+  "author": "Steve Dignam <steve@dignam.xyz>",
+  "license": "AGPL-3.0-only",
+  "dependencies": {
+    "@slack/web-api": "^5.6.0",
+    "axios": "^0.19.0",
+    "bunyan": "^1.8.12",
+    "date-fns": "^2.8.1",
+    "date-fns-tz": "^1.0.8",
+    "dotenv": "^8.2.0"
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "test": "TZ=UTC jest",
+    "fmt": "prettier '*.{ts, json, md}' --write"
+  },
+  "devDependencies": {
+    "@types/bunyan": "^1.8.6",
+    "@types/express": "^4.17.2",
+    "@types/jest": "^24.0.23",
+    "jest": "^24.9.0",
+    "prettier": "^1.19.1",
+    "ts-jest": "^24.2.0",
+    "typescript": "^3.7.2"
+  }
+}

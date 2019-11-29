@@ -1,0 +1,17 @@
+#!/bin/sh
+set -o errexit
+set -o nounset
+
+main() {
+    echo "removing old deploy zip"
+    rm -f deploy.zip
+    echo "compiling source files"
+    yarn tsc --project tsconfig.json
+    echo "adding source files"
+    zip --recurse-paths --junk-paths --quiet deploy.zip build
+    echo "adding node_modules"
+    zip --recurse-paths --update --quiet deploy.zip node_modules
+    echo "done"
+}
+
+main "$@"
