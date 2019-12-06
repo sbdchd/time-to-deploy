@@ -53,24 +53,29 @@ function createTestHeroku({ isRollback }: ICreateTestHeroku): IHeroku {
 
 describe("message", () => {
   test("humanize", () => {
-    const getCurrentDate = () => new Date("2019-10-29T00:00:00Z")
+    const getCurrentDate = () => new Date("2019-10-28T00:00:00Z")
+
+    const date = "2019-10-27T21:03:14Z"
 
     expect(
       humanize({
-        date: "2019-10-27T21:03:14Z",
+        date,
         timezone: null,
         getCurrentDate,
       }),
-    ).toMatchInlineSnapshot(`"1 day ago at 9:03 p.m. (Oct 27, 2019) UTC"`)
+    ).toMatchInlineSnapshot(
+      `"about 3 hours ago at 9:03 p.m. (Oct 27, 2019) UTC"`,
+    )
 
     expect(
       humanize({
-        date: "2019-10-27T21:03:14Z",
+        date,
         timezone: "America/New_York",
         getCurrentDate,
       }),
-    ).toMatchInlineSnapshot(`"1 day ago at 5:03 p.m. (Oct 27, 2019)"`)
+    ).toMatchInlineSnapshot(`"about 3 hours ago at 5:03 p.m. (Oct 27, 2019)"`)
   })
+
   const config: IConfig = {
     projectName: "Time To Deploy Project",
     stagingEnvURL: "https://staging.example.com",

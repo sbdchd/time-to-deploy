@@ -34,7 +34,7 @@ export function humanize({
 }: IHumanize): string {
   const d = timezone == null ? new Date(date) : utcToZonedTime(date, timezone)
   return (
-    formatDistance(d, getCurrentDate(), { addSuffix: true }) +
+    formatDistance(new Date(date), getCurrentDate(), { addSuffix: true }) +
     " at " +
     format(d, "h:mm aaaa (MMM d, yyyy)") +
     (timezone == null ? " UTC" : "")
