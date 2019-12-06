@@ -46,6 +46,7 @@ export async function herokuGetMostRecentDeployInfo({
   const releaseJson = releasesRes.data
   const mostRecentSlugId = releaseJson[0].slug.id
   const createdAt = releaseJson[0].created_at
+  const deployerEmail = releaseJson[0].user.email
   const isRollback = releaseJson[0].description
     .toLowerCase()
     .includes("rollback")
@@ -66,5 +67,6 @@ export async function herokuGetMostRecentDeployInfo({
     sha: mostRecentDeploySha,
     createdAt,
     isRollback,
+    deployerEmail,
   }
 }

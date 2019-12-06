@@ -6,6 +6,8 @@ export interface IGetLastDeployResponse {
   readonly sha: string
   readonly createdAt: string
   readonly isRollback: boolean
+  /** Email of the user who deployed. */
+  readonly deployerEmail: string
 }
 
 export interface IHeroku {
@@ -101,7 +103,11 @@ export async function getResponse(
             date: lastDeploy.createdAt,
             timezone: config.timezone,
           })}
-${lastDeploy.isRollback ? "*Attention*: Last deploy was a *rollback*" : ""}`,
+${
+  lastDeploy.isRollback
+    ? `*Attention*: Last deploy was a *rollback* by ${lastDeploy.deployerEmail}`
+    : ""
+}`,
         },
       ],
     },

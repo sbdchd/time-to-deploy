@@ -43,6 +43,7 @@ function createTestHeroku({ isRollback }: ICreateTestHeroku): IHeroku {
         sha: "a8f68d19a290ad8a7eb19019de6ca58cecb444ce",
         createdAt: "2019-11-27T21:11:14Z",
         isRollback,
+        deployerEmail: "j.person@example.com",
       }
     },
     async getStagingSha() {
@@ -155,7 +156,7 @@ describe("message", () => {
           "elements": Array [
             Object {
               "text": "Last deployed: <https://github.com/AdmitHub/marshall/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 9:11 p.m. (Nov 27, 2019) UTC
-      *Attention*: Last deploy was a *rollback*",
+      *Attention*: Last deploy was a *rollback* by j.person@example.com",
               "type": "mrkdwn",
             },
           ],
