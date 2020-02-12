@@ -35,19 +35,25 @@ function mockDate(expected: Date) {
 
 interface ICreateTestHeroku {
   readonly isRollback: boolean
+  readonly noChangesToDeploy?: boolean
 }
-function createTestHeroku({ isRollback }: ICreateTestHeroku): IHeroku {
+function createTestHeroku({
+  isRollback,
+  noChangesToDeploy = false,
+}: ICreateTestHeroku): IHeroku {
+  const firstSha = "a8f68d19a290ad8a7eb19019de6ca58cecb444ce"
+  const secondSha = "9c45ead4395ae80bc9a047f0a8474acc3ef93992"
   return {
     async getLastDeploy() {
       return {
-        sha: "a8f68d19a290ad8a7eb19019de6ca58cecb444ce",
+        sha: firstSha,
         createdAt: "2019-11-27T21:11:14Z",
         isRollback,
         deployerEmail: "j.person@example.com",
       }
     },
     async getStagingSha() {
-      return "9c45ead4395ae80bc9a047f0a8474acc3ef93992"
+      return noChangesToDeploy ? firstSha : secondSha
     },
   }
 }
@@ -157,6 +163,45 @@ describe("message", () => {
             Object {
               "text": "Last deployed: <https://github.com/AdmitHub/marshall/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 9:11 p.m. (Nov 27, 2019) UTC
       *Attention*: Last deploy was a *rollback* by j.person@example.com",
+              "type": "mrkdwn",
+            },
+          ],
+          "type": "context",
+        },
+      ]
+    `)
+
+    const noChangesRes = await getResponse(
+      config,
+      createTestHeroku({ isRollback: false, noChangesToDeploy: true }),
+    )
+    expect(noChangesRes).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "accessory": Object {
+            "text": Object {
+              "emoji": true,
+              "text": "Promote Staging 🚢",
+              "type": "plain_text",
+            },
+            "type": "button",
+            "url": "https://dashboard.heroku.com",
+          },
+          "text": Object {
+            "text": "*Time To Deploy Project*
+      • <https://github.com/AdmitHub/marshall/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
+      • envs
+          ◦ <https://staging.example.com| staging>
+          ◦ <https://prod.example.com| production>",
+            "type": "mrkdwn",
+          },
+          "type": "section",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "Last deployed: <https://github.com/AdmitHub/marshall/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 9:11 p.m. (Nov 27, 2019) UTC
+      ",
               "type": "mrkdwn",
             },
           ],
