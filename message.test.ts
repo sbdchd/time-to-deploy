@@ -35,19 +35,25 @@ function mockDate(expected: Date) {
 
 interface ICreateTestHeroku {
   readonly isRollback: boolean
+  readonly noChangesToDeploy?: boolean
 }
-function createTestHeroku({ isRollback }: ICreateTestHeroku): IHeroku {
+function createTestHeroku({
+  isRollback,
+  noChangesToDeploy = false,
+}: ICreateTestHeroku): IHeroku {
+  const firstSha = "a8f68d19a290ad8a7eb19019de6ca58cecb444ce"
+  const secondSha = "9c45ead4395ae80bc9a047f0a8474acc3ef93992"
   return {
     async getLastDeploy() {
       return {
-        sha: "a8f68d19a290ad8a7eb19019de6ca58cecb444ce",
+        sha: firstSha,
         createdAt: "2019-11-27T21:11:14Z",
         isRollback,
         deployerEmail: "j.person@example.com",
       }
     },
     async getStagingSha() {
-      return "9c45ead4395ae80bc9a047f0a8474acc3ef93992"
+      return noChangesToDeploy ? firstSha : secondSha
     },
   }
 }
@@ -164,6 +170,12 @@ describe("message", () => {
         },
       ]
     `)
+
+    const noChangesRes = await getResponse(
+      config,
+      createTestHeroku({ isRollback: false, noChangesToDeploy: true }),
+    )
+    expect(noChangesRes).toMatchInlineSnapshot()
 
     mock()
   })

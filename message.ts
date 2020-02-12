@@ -53,9 +53,17 @@ function getBodyText({ config, lastDeploySha, stagingSha }: IGetBodyText) {
     lastDeploySha && stagingSha
       ? `https://github.com/AdmitHub/marshall/compare/${lastDeploySha}...${stagingSha}`
       : null
+
+  const noChanges = lastDeploySha === stagingSha
   return `\
 *${config.projectName}*
-${diffUrl ? `• <${diffUrl}|diff (_staging..production_)>` : ""}
+${
+  diffUrl
+    ? `• <${diffUrl}|diff (_staging..production_)>${
+        noChanges ? " (no changes)" : ""
+      }`
+    : ""
+}
 • envs
     ◦ <${config.stagingEnvURL}| staging>
     ◦ <${config.productionEnvURL}| production>`
