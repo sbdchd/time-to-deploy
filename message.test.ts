@@ -175,7 +175,40 @@ describe("message", () => {
       config,
       createTestHeroku({ isRollback: false, noChangesToDeploy: true }),
     )
-    expect(noChangesRes).toMatchInlineSnapshot()
+    expect(noChangesRes).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "accessory": Object {
+            "text": Object {
+              "emoji": true,
+              "text": "Promote Staging 🚢",
+              "type": "plain_text",
+            },
+            "type": "button",
+            "url": "https://dashboard.heroku.com",
+          },
+          "text": Object {
+            "text": "*Time To Deploy Project*
+      • <https://github.com/AdmitHub/marshall/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
+      • envs
+          ◦ <https://staging.example.com| staging>
+          ◦ <https://prod.example.com| production>",
+            "type": "mrkdwn",
+          },
+          "type": "section",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "Last deployed: <https://github.com/AdmitHub/marshall/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 9:11 p.m. (Nov 27, 2019) UTC
+      ",
+              "type": "mrkdwn",
+            },
+          ],
+          "type": "context",
+        },
+      ]
+    `)
 
     mock()
   })
