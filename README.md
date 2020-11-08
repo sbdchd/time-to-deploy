@@ -77,10 +77,8 @@ s/run
 ```shell
 yarn install
 
-yarn test
-yarn fmt
-yarn typecheck
 s/lint
+s/test
 
 s/build
 

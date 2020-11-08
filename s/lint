@@ -1,3 +1,15 @@
 #!/bin/sh
+set -ex
 
-./node_modules/.bin/eslint '**/*.{ts,js}' --fix
+main() {
+  if [ "$CI" ]; then
+    yarn eslint '**/*.{ts,js}'
+    yarn prettier --check '**/*.{js,ts,md,yml,json}'
+  else
+    yarn eslint '**/*.{ts,js}' --fix
+    yarn prettier --write '**/*.{js,ts,md,yml,json}'
+  fi
+  yarn tsc --noEmit --project tsconfig.json
+}
+
+main "$@"

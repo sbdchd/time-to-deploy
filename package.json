@@ -14,12 +14,7 @@
     "fp-ts": "^2.8.5",
     "io-ts": "^2.2.12"
   },
-  "scripts": {
-    "build": "tsc --project tsconfig.json",
-    "typecheck": "tsc --noEmit --project tsconfig.json",
-    "test": "TZ=UTC jest",
-    "fmt": "prettier '*.{ts, json, md}' --write"
-  },
+  "scripts": {},
   "devDependencies": {
     "@types/bunyan": "^1.8.6",
     "@types/express": "^4.17.2",
