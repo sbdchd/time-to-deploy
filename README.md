@@ -7,7 +7,7 @@
 Using a `/remind` works in Slack but info is lacking. The Heroku dashboard
 also doesn't show a diff between prod and staging when there was a rollback.
 
-This Slack bot provides info about Heroku deployments include:
+This Slack bot provides info about Heroku deployments including:
 
 - diff between staging and production
 - current commit on production
@@ -80,6 +80,7 @@ yarn install
 yarn test
 yarn fmt
 yarn typecheck
+s/lint
 
 s/build
 
