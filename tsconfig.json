@@ -2,7 +2,8 @@
   "compilerOptions": {
     "outDir": "./build/",
     "sourceMap": true,
-    "allowJs": false,
+    "allowJs": true,
+    "checkJs": true,
     "target": "es2017",
     "module": "commonjs",
     "moduleResolution": "node",

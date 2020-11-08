@@ -1,62 +1,42 @@
+import { right } from "fp-ts/lib/Either"
 import {
   humanize,
-  getResponse,
   getFallbackMessage,
-  IConfig,
-  IHeroku,
+  getMessage,
+  ProjectsSchema,
 } from "./message"
+import * as t from "io-ts"
 
-// via https://kimpers.com/mocking-date-and-time-in-tests-with-typescript-and-jest/
-function mockDate(expected: Date) {
-  const _Date = Date
-
-  // If any Date or number is passed to the constructor
-  // use that instead of our mocked date
-  function MockDate(mockOverride?: Date | number) {
-    return new _Date(mockOverride || expected)
-  }
-
-  MockDate.UTC = _Date.UTC
-  MockDate.parse = _Date.parse
-  MockDate.now = () => expected.getTime()
-  // Give our mock Date has the same prototype as Date
-  // Some libraries rely on this to identify Date objects
-  MockDate.prototype = _Date.prototype
-
-  // Our mock is not a full implementation of Date
-  // Types will not match but it's good enough for our tests
-  global.Date = MockDate as any
-
-  // Callback function to remove the Date mock
-  return () => {
-    global.Date = _Date
-  }
-}
-
-interface ICreateTestHeroku {
-  readonly isRollback: boolean
-  readonly noChangesToDeploy?: boolean
-}
 function createTestHeroku({
   isRollback,
   noChangesToDeploy = false,
-}: ICreateTestHeroku): IHeroku {
+}: {
+  readonly isRollback: boolean
+  readonly noChangesToDeploy?: boolean
+}) {
   const firstSha = "a8f68d19a290ad8a7eb19019de6ca58cecb444ce"
   const secondSha = "9c45ead4395ae80bc9a047f0a8474acc3ef93992"
-  return {
-    async getLastDeploy() {
-      return {
-        sha: firstSha,
+
+  return async ({ envName }: { envName: string }) => {
+    if (envName === "staging") {
+      const sha = noChangesToDeploy ? firstSha : secondSha
+      return right({
+        sha,
         createdAt: "2019-11-27T21:11:14Z",
         isRollback,
         deployerEmail: "j.person@example.com",
-      }
-    },
-    async getStagingSha() {
-      return noChangesToDeploy ? firstSha : secondSha
-    },
+      })
+    }
+    return right({
+      sha: firstSha,
+      createdAt: "2019-11-27T21:11:14Z",
+      isRollback,
+      deployerEmail: "j.person@example.com",
+    })
   }
 }
+
+type ProjectSchemaType = t.TypeOf<typeof ProjectsSchema>
 
 describe("message", () => {
   test("humanize", () => {
@@ -83,19 +63,31 @@ describe("message", () => {
     ).toMatchInlineSnapshot(`"about 3 hours ago at 5:03 p.m. (Oct 27, 2019)"`)
   })
 
-  const config: IConfig = {
-    projectName: "Time To Deploy Project",
-    stagingEnvURL: "https://staging.example.com",
-    productionEnvURL: "https://prod.example.com",
-    promotionDashboardURL: "https://dashboard.heroku.com",
-    timezone: null,
-  }
+  test("getMessage", async () => {
+    const getCurrentDate = () => new Date("2019-11-28T02:00:00Z")
 
-  test("getResponse", async () => {
-    const mock = mockDate(new Date("2019-11-28T02:00:00Z"))
-    const res = await getResponse(
-      config,
-      createTestHeroku({ isRollback: false }),
+    const projectSettings: ProjectSchemaType = [
+      {
+        name: "Time To Deploy Project",
+        repoURL: "https://github.com/ghost/time-to-deploy",
+        stagingEnvURL: "https://staging.example.com",
+        productionEnvURL: "https://prod.example.com",
+        stagingEnvName: "staging name",
+        productionEnvName: "production name",
+      },
+    ]
+
+    const env = {
+      TTD_PROJECT_SETTINGS: JSON.stringify(projectSettings),
+      TTD_HEROKU_API_TOKEN: "fake-heroku-api-token",
+      TTD_TIMEZONE: "America/New_York",
+    }
+    const res = await getMessage(
+      env,
+      {
+        getMostRecentDeployInfo: createTestHeroku({ isRollback: false }),
+      },
+      getCurrentDate,
     )
     expect(res).toMatchInlineSnapshot(`
       Array [
@@ -107,11 +99,11 @@ describe("message", () => {
               "type": "plain_text",
             },
             "type": "button",
-            "url": "https://dashboard.heroku.com",
+            "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
           },
           "text": Object {
             "text": "*Time To Deploy Project*
-      • <https://github.com/AdmitHub/marshall/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+      • <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -122,7 +114,7 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/AdmitHub/marshall/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 9:11 p.m. (Nov 27, 2019) UTC
+              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -132,9 +124,10 @@ describe("message", () => {
       ]
     `)
 
-    const rollbackRes = await getResponse(
-      config,
-      createTestHeroku({ isRollback: true }),
+    const rollbackRes = await getMessage(
+      env,
+      { getMostRecentDeployInfo: createTestHeroku({ isRollback: true }) },
+      getCurrentDate,
     )
     expect(rollbackRes).toMatchInlineSnapshot(`
       Array [
@@ -146,11 +139,11 @@ describe("message", () => {
               "type": "plain_text",
             },
             "type": "button",
-            "url": "https://dashboard.heroku.com",
+            "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
           },
           "text": Object {
             "text": "*Time To Deploy Project*
-      • <https://github.com/AdmitHub/marshall/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+      • <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -161,7 +154,7 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/AdmitHub/marshall/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 9:11 p.m. (Nov 27, 2019) UTC
+              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 4:11 p.m. (Nov 27, 2019)
       *Attention*: Last deploy was a *rollback* by j.person@example.com",
               "type": "mrkdwn",
             },
@@ -171,9 +164,15 @@ describe("message", () => {
       ]
     `)
 
-    const noChangesRes = await getResponse(
-      config,
-      createTestHeroku({ isRollback: false, noChangesToDeploy: true }),
+    const noChangesRes = await getMessage(
+      env,
+      {
+        getMostRecentDeployInfo: createTestHeroku({
+          isRollback: false,
+          noChangesToDeploy: true,
+        }),
+      },
+      getCurrentDate,
     )
     expect(noChangesRes).toMatchInlineSnapshot(`
       Array [
@@ -185,11 +184,11 @@ describe("message", () => {
               "type": "plain_text",
             },
             "type": "button",
-            "url": "https://dashboard.heroku.com",
+            "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
           },
           "text": Object {
             "text": "*Time To Deploy Project*
-      • <https://github.com/AdmitHub/marshall/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
+      • <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -200,7 +199,7 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/AdmitHub/marshall/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 9:11 p.m. (Nov 27, 2019) UTC
+              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -210,10 +209,111 @@ describe("message", () => {
       ]
     `)
 
-    mock()
+    const projectSettings2: ProjectSchemaType = [
+      {
+        name: "Acacia",
+        repoURL: "https://github.com/ghost/Acacia",
+        stagingEnvURL: "https://staging.example.com",
+        productionEnvURL: "https://prod.example.com",
+        stagingEnvName: "staging name",
+        productionEnvName: "production name",
+      },
+      {
+        name: "Altair",
+        repoURL: "https://github.com/ghost/altair",
+        stagingEnvURL: null,
+        productionEnvURL: null,
+        stagingEnvName: "altair staging",
+        productionEnvName: "altair production",
+      },
+    ]
+    const multipleEnvs = await getMessage(
+      {
+        TTD_PROJECT_SETTINGS: JSON.stringify(projectSettings2),
+        TTD_HEROKU_API_TOKEN: "fake-heroku-api-token",
+        TTD_TIMEZONE: "America/New_York",
+      },
+      {
+        getMostRecentDeployInfo: createTestHeroku({
+          isRollback: false,
+        }),
+      },
+      getCurrentDate,
+    )
+
+    expect(multipleEnvs).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "accessory": Object {
+            "text": Object {
+              "emoji": true,
+              "text": "Promote Staging 🚢",
+              "type": "plain_text",
+            },
+            "type": "button",
+            "url": "https://dashboard.heroku.com/pipelines/acacia",
+          },
+          "text": Object {
+            "text": "*Acacia*
+      • <https://github.com/ghost/Acacia/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
+      • envs
+          ◦ <https://staging.example.com| staging>
+          ◦ <https://prod.example.com| production>",
+            "type": "mrkdwn",
+          },
+          "type": "section",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "Last deployed: <https://github.com/ghost/Acacia/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 4:11 p.m. (Nov 27, 2019)
+      ",
+              "type": "mrkdwn",
+            },
+          ],
+          "type": "context",
+        },
+        Object {
+          "accessory": Object {
+            "text": Object {
+              "emoji": true,
+              "text": "Promote Staging 🚢",
+              "type": "plain_text",
+            },
+            "type": "button",
+            "url": "https://dashboard.heroku.com/pipelines/altair",
+          },
+          "text": Object {
+            "text": "*Altair*
+      • <https://github.com/ghost/altair/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
+      ",
+            "type": "mrkdwn",
+          },
+          "type": "section",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "Last deployed: <https://github.com/ghost/altair/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 4:11 p.m. (Nov 27, 2019)
+      ",
+              "type": "mrkdwn",
+            },
+          ],
+          "type": "context",
+        },
+      ]
+    `)
   })
 
   test("getFallbackMessage", () => {
+    const config = {
+      projectName: "Time To Deploy Project",
+      repoURL: "https://github.com/ghost/time-to-deploy",
+      stagingEnvURL: "https://staging.example.com",
+      productionEnvURL: "https://prod.example.com",
+      promotionDashboardURL: "https://dashboard.heroku.com",
+      timezone: null,
+    }
     const msg = getFallbackMessage(config)
 
     expect(msg).toMatchInlineSnapshot(`
