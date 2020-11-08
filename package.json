@@ -12,12 +12,7 @@
     "date-fns-tz": "^1.0.8",
     "dotenv": "^8.2.0"
   },
-  "scripts": {
-    "build": "tsc --project tsconfig.json",
-    "typecheck": "tsc --noEmit --project tsconfig.json",
-    "test": "TZ=UTC jest",
-    "fmt": "prettier '*.{ts, json, md}' --write"
-  },
+  "scripts": {},
   "devDependencies": {
     "@types/bunyan": "^1.8.6",
     "@types/express": "^4.17.2",
