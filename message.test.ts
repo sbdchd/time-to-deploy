@@ -92,18 +92,9 @@ describe("message", () => {
     expect(res).toMatchInlineSnapshot(`
       Array [
         Object {
-          "accessory": Object {
-            "text": Object {
-              "emoji": true,
-              "text": "Promote Staging 🚢",
-              "type": "plain_text",
-            },
-            "type": "button",
-            "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
-          },
+          "accessory": undefined,
           "text": Object {
-            "text": "*Time To Deploy Project*
-      • <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
+            "text": "*Time To Deploy Project* — no changes
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -132,18 +123,9 @@ describe("message", () => {
     expect(rollbackRes).toMatchInlineSnapshot(`
       Array [
         Object {
-          "accessory": Object {
-            "text": Object {
-              "emoji": true,
-              "text": "Promote Staging 🚢",
-              "type": "plain_text",
-            },
-            "type": "button",
-            "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
-          },
+          "accessory": undefined,
           "text": Object {
-            "text": "*Time To Deploy Project*
-      • <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
+            "text": "*Time To Deploy Project* — no changes
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -177,18 +159,9 @@ describe("message", () => {
     expect(noChangesRes).toMatchInlineSnapshot(`
       Array [
         Object {
-          "accessory": Object {
-            "text": Object {
-              "emoji": true,
-              "text": "Promote Staging 🚢",
-              "type": "plain_text",
-            },
-            "type": "button",
-            "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
-          },
+          "accessory": undefined,
           "text": Object {
-            "text": "*Time To Deploy Project*
-      • <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
+            "text": "*Time To Deploy Project* — no changes
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -244,18 +217,9 @@ describe("message", () => {
     expect(multipleEnvs).toMatchInlineSnapshot(`
       Array [
         Object {
-          "accessory": Object {
-            "text": Object {
-              "emoji": true,
-              "text": "Promote Staging 🚢",
-              "type": "plain_text",
-            },
-            "type": "button",
-            "url": "https://dashboard.heroku.com/pipelines/acacia",
-          },
+          "accessory": undefined,
           "text": Object {
-            "text": "*Acacia*
-      • <https://github.com/ghost/Acacia/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
+            "text": "*Acacia* — no changes
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -274,18 +238,9 @@ describe("message", () => {
           "type": "context",
         },
         Object {
-          "accessory": Object {
-            "text": Object {
-              "emoji": true,
-              "text": "Promote Staging 🚢",
-              "type": "plain_text",
-            },
-            "type": "button",
-            "url": "https://dashboard.heroku.com/pipelines/altair",
-          },
+          "accessory": undefined,
           "text": Object {
-            "text": "*Altair*
-      • <https://github.com/ghost/altair/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...a8f68d19a290ad8a7eb19019de6ca58cecb444ce|diff (_staging..production_)> (no changes)
+            "text": "*Altair* — no changes
       ",
             "type": "mrkdwn",
           },
@@ -329,8 +284,7 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com",
           },
           "text": Object {
-            "text": "*Time To Deploy Project*
-
+            "text": "*Time To Deploy Project* — no changes
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
