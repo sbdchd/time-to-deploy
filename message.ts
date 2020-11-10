@@ -48,6 +48,22 @@ function getEnvsInfo(config: {
   return ""
 }
 
+function getDiffText({
+  diffUrl,
+  hasChanges,
+}: {
+  readonly hasChanges: boolean
+  readonly diffUrl: string | null
+}): string {
+  if (diffUrl && hasChanges) {
+    return ` — <${diffUrl}|diff (_staging..production_)>`
+  }
+  if (hasChanges) {
+    return ""
+  }
+  return " — no changes"
+}
+
 function getBodyText({
   config,
   lastDeploySha,
@@ -67,16 +83,12 @@ function getBodyText({
       ? `${config.repoURL}/compare/${lastDeploySha}...${stagingSha}`
       : null
 
-  const noChanges = lastDeploySha === stagingSha
+  const hasChanges = lastDeploySha !== stagingSha
   return `\
-*${config.projectName}*
-${
-  diffUrl
-    ? `• <${diffUrl}|diff (_staging..production_)>${
-        noChanges ? " (no changes)" : ""
-      }`
-    : ""
-}
+*${config.projectName}*${getDiffText({
+    diffUrl,
+    hasChanges,
+  })}
 ${getEnvsInfo(config)}`
 }
 
@@ -109,15 +121,18 @@ export function getResponse(config: {
           stagingSha: config.stagingSha,
         }),
       },
-      accessory: {
-        type: "button",
-        text: {
-          type: "plain_text",
-          text: "Promote Staging 🚢",
-          emoji: true,
-        },
-        url: config.promotionDashboardURL,
-      },
+      accessory:
+        config.lastDeploy.sha != config.stagingSha
+          ? {
+              type: "button",
+              text: {
+                type: "plain_text",
+                text: "Promote Staging 🚢",
+                emoji: true,
+              },
+              url: config.promotionDashboardURL,
+            }
+          : undefined,
     },
     {
       type: "context",
