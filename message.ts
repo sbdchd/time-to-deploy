@@ -122,7 +122,7 @@ export function getResponse(config: {
         }),
       },
       accessory:
-        config.lastDeploy.sha != config.stagingSha
+        config.lastDeploy.sha !== config.stagingSha
           ? {
               type: "button",
               text: {
