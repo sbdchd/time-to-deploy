@@ -1,4 +1,4 @@
-import { formatDistance, format } from "date-fns"
+import { formatDistance, format, getUnixTime } from "date-fns"
 import { utcToZonedTime } from "date-fns-tz"
 import { GetLastDeployResponse } from "./heroku"
 import { KnownBlock } from "@slack/web-api"
@@ -7,7 +7,6 @@ import * as et from "io-ts/Type"
 import { Either, isLeft, isRight } from "fp-ts/lib/Either"
 import { flatten } from "fp-ts/lib/Array"
 import { AxiosError } from "axios"
-import { getEnvVar } from "./env"
 import { log } from "./logging"
 
 export function humanize({
@@ -16,15 +15,14 @@ export function humanize({
   getCurrentDate,
 }: {
   readonly date: string
-  readonly timezone: string | null
+  readonly timezone: string
   readonly getCurrentDate: () => Date
 }): string {
-  const d = timezone == null ? new Date(date) : utcToZonedTime(date, timezone)
+  const d = utcToZonedTime(date, timezone)
   return (
     formatDistance(new Date(date), getCurrentDate(), { addSuffix: true }) +
     " at " +
-    format(d, "h:mm aaaa (MMM d, yyyy)") +
-    (timezone == null ? " UTC" : "")
+    format(d, "h:mm aaaa (MMM d, yyyy)")
   )
 }
 
@@ -226,9 +224,9 @@ function getMessageOrDefault(config: {
   })
 }
 
-function getProjectSettings(env: NodeJS.ProcessEnv) {
+function getProjectSettings(env: { readonly TTD_PROJECT_SETTINGS: string }) {
   const parsedResult = ProjectsSchema.decode(
-    JSON.parse(getEnvVar("TTD_PROJECT_SETTINGS", env)),
+    JSON.parse(env.TTD_PROJECT_SETTINGS),
   )
   if (isRight(parsedResult)) {
     return parsedResult.right
@@ -240,13 +238,12 @@ function getProjectSettings(env: NodeJS.ProcessEnv) {
       2,
     )}`,
   )
-  throw Error("problem parisng project settings")
+  throw Error("problem parsing project settings")
 }
 
-type Heroku = {
+export type Heroku = {
   getMostRecentDeployInfo: (param: {
     readonly envName: string
-    readonly token: string
   }) => Promise<
     Either<t.Errors | AxiosError<unknown> | Error, GetLastDeployResponse>
   >
@@ -255,15 +252,12 @@ type Heroku = {
 async function getLastDeploy({
   heroku,
   envName,
-  token,
 }: {
   readonly heroku: Heroku
   readonly envName: string
-  readonly token: string
 }): Promise<GetLastDeployResponse | null> {
   const res = await heroku.getMostRecentDeployInfo({
     envName,
-    token,
   })
   if (isLeft(res)) {
     log.warn("failed to get recent deploy info", envName)
@@ -275,15 +269,12 @@ async function getLastDeploy({
 async function getStagingSha({
   heroku,
   envName,
-  token,
 }: {
   readonly heroku: Heroku
   readonly envName: string
-  readonly token: string
 }): Promise<string | null> {
   const res = await heroku.getMostRecentDeployInfo({
     envName,
-    token,
   })
   if (isLeft(res)) {
     log.warn("failed to get staging sha", envName)
@@ -293,13 +284,14 @@ async function getStagingSha({
 }
 
 export async function getMessage(
-  env: NodeJS.ProcessEnv,
+  env: {
+    readonly TTD_TIMEZONE: string
+    readonly TTD_PROJECT_SETTINGS: string
+  },
   heroku: Heroku,
   getCurrentDate: () => Date,
 ): Promise<KnownBlock[]> {
-  const HEROKU_API_TOKEN = getEnvVar("TTD_HEROKU_API_TOKEN", env)
-
-  const TIMEZONE = getEnvVar("TTD_TIMEZONE", env)
+  const TIMEZONE = env.TTD_TIMEZONE
 
   const projectSettings = getProjectSettings(env)
 
@@ -311,12 +303,10 @@ export async function getMessage(
         getStagingSha({
           heroku,
           envName: settings.stagingEnvName,
-          token: HEROKU_API_TOKEN,
         }),
         getLastDeploy({
           heroku,
           envName: settings.productionEnvName,
-          token: HEROKU_API_TOKEN,
         }),
       ])
       return {

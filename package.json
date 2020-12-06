@@ -6,6 +6,7 @@
   "license": "AGPL-3.0-only",
   "dependencies": {
     "@slack/web-api": "^5.6.0",
+    "aws-sdk": "^2.804.0",
     "axios": "^0.19.0",
     "bunyan": "^1.8.12",
     "date-fns": "^2.8.1",
@@ -21,6 +22,7 @@
     "@types/jest": "^24.0.23",
     "@typescript-eslint/eslint-plugin": "^4.6.1",
     "@typescript-eslint/parser": "^4.6.1",
+    "esbuild": "^0.8.19",
     "eslint": "^7.13.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.1.4",

@@ -1,9 +1,11 @@
 import dotenv from "dotenv"
-import { herokuGetMostRecentDeployInfo } from "./heroku"
-import { WebClient, retryPolicies } from "@slack/web-api"
+import { createHerokuClient } from "./heroku"
 import { log } from "./logging"
-import { getEnvVar } from "./env"
-import { getMessage } from "./message"
+import { createSlackClient } from "./slack"
+import { createDbClient } from "./db"
+import { main } from "./handler"
+import * as t from "io-ts"
+import { isLeft } from "fp-ts/lib/Either"
 
 dotenv.config()
 
@@ -11,40 +13,32 @@ function getCurrentDate() {
   return new Date()
 }
 
-export async function handler() {
+const EnvShape = t.type({
+  TTD_SLACK_CHANNEL_ID: t.string,
+  TTD_HTTP_AUTH_TOKEN: t.string,
+  TTD_SLACK_API_TOKEN: t.string,
+  TTD_DYNAMO_TABLE_NAME: t.string,
+  TTD_HEROKU_API_TOKEN: t.string,
+  TTD_TIMEZONE: t.string,
+  TTD_PROJECT_SETTINGS: t.string,
+})
+
+export async function handler(event: unknown) {
   log.info("Starting...")
 
-  const SLACK_CHANNEL_ID = getEnvVar("TTD_SLACK_CHANNEL_ID", process.env)
-  const SLACK_API_TOKEN = getEnvVar("TTD_SLACK_API_TOKEN", process.env)
+  const env = EnvShape.decode(process.env)
 
-  const heroku = {
-    getMostRecentDeployInfo: herokuGetMostRecentDeployInfo,
+  if (isLeft(env)) {
+    log.error("problem parsing env", env)
+    return
   }
 
-  const message = await getMessage(process.env, heroku, getCurrentDate)
-
-  log.info("Created message")
-
-  const web = new WebClient(SLACK_API_TOKEN, {
-    retryConfig: retryPolicies.fiveRetriesInFiveMinutes,
+  await main({
+    heroku: createHerokuClient(env.right.TTD_HEROKU_API_TOKEN),
+    slack: createSlackClient(env.right.TTD_SLACK_API_TOKEN),
+    db: createDbClient(env.right.TTD_DYNAMO_TABLE_NAME),
+    env: env.right,
+    event,
+    getCurrentDate,
   })
-
-  try {
-    log.info("Sending message")
-    const result = await web.chat.postMessage({
-      // Text forms the notification message.
-      // see: https://api.slack.com/reference/messaging/payload
-      text: "Time to deploy",
-      // Blocks form the actual message body that is rendered in Slack.
-      blocks: message,
-      channel: SLACK_CHANNEL_ID,
-    })
-    log.info("Sent message to slack", result)
-  } catch (e) {
-    log.warn("Problem sending message to slack", e)
-  }
-}
-
-if (!module.parent) {
-  handler()
 }

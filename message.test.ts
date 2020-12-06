@@ -203,7 +203,6 @@ describe("message", () => {
     const multipleEnvs = await getMessage(
       {
         TTD_PROJECT_SETTINGS: JSON.stringify(projectSettings2),
-        TTD_HEROKU_API_TOKEN: "fake-heroku-api-token",
         TTD_TIMEZONE: "America/New_York",
       },
       {
