@@ -1,4 +1,4 @@
-import { formatDistance, format, getUnixTime } from "date-fns"
+import { formatDistance, format } from "date-fns"
 import { utcToZonedTime } from "date-fns-tz"
 import { GetLastDeployResponse } from "./heroku"
 import { KnownBlock } from "@slack/web-api"

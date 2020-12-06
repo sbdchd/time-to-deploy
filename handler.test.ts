@@ -124,7 +124,7 @@ describe("handler:main", () => {
       Array [
         Object {
           "args": Object {
-            "key": "2020-12-01T00:00:00.000Z",
+            "key": "2020-12-01T00:00:00.000Zfake-slack-channel-id",
             "ttl": 1608052022,
             "value": "fake-ts-value",
           },

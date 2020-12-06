@@ -47,16 +47,6 @@ describe("message", () => {
     expect(
       humanize({
         date,
-        timezone: null,
-        getCurrentDate,
-      }),
-    ).toMatchInlineSnapshot(
-      `"about 3 hours ago at 9:03 p.m. (Oct 27, 2019) UTC"`,
-    )
-
-    expect(
-      humanize({
-        date,
         timezone: "America/New_York",
         getCurrentDate,
       }),
