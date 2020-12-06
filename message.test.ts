@@ -47,16 +47,6 @@ describe("message", () => {
     expect(
       humanize({
         date,
-        timezone: null,
-        getCurrentDate,
-      }),
-    ).toMatchInlineSnapshot(
-      `"about 3 hours ago at 9:03 p.m. (Oct 27, 2019) UTC"`,
-    )
-
-    expect(
-      humanize({
-        date,
         timezone: "America/New_York",
         getCurrentDate,
       }),
@@ -203,7 +193,6 @@ describe("message", () => {
     const multipleEnvs = await getMessage(
       {
         TTD_PROJECT_SETTINGS: JSON.stringify(projectSettings2),
-        TTD_HEROKU_API_TOKEN: "fake-heroku-api-token",
         TTD_TIMEZONE: "America/New_York",
       },
       {
