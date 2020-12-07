@@ -6,6 +6,7 @@ import {
   ProjectsSchema,
 } from "./message"
 import * as t from "io-ts"
+import { subDays } from "date-fns"
 
 function createTestHeroku({
   isRollback,
@@ -40,7 +41,8 @@ type ProjectSchemaType = t.TypeOf<typeof ProjectsSchema>
 
 describe("message", () => {
   test("humanize", () => {
-    const getCurrentDate = () => new Date("2019-10-28T00:00:00Z")
+    const CURRENT_DATE = new Date("2019-10-28T00:00:00Z")
+    const getCurrentDate = () => CURRENT_DATE
 
     const date = "2019-10-27T21:03:14Z"
 
@@ -50,7 +52,16 @@ describe("message", () => {
         timezone: "America/New_York",
         getCurrentDate,
       }),
-    ).toMatchInlineSnapshot(`"about 3 hours ago at 5:03 p.m. (Oct 27, 2019)"`)
+    ).toMatchInlineSnapshot(`"Today at 5:03 p.m. (Oct 27, 2019)"`)
+
+    const pastDate = subDays(CURRENT_DATE, 5).toISOString()
+    expect(
+      humanize({
+        date: pastDate,
+        timezone: "America/New_York",
+        getCurrentDate,
+      }),
+    ).toMatchInlineSnapshot(`"5 days ago at 8:00 p.m. (Oct 22, 2019)"`)
   })
 
   test("getMessage", async () => {
@@ -95,7 +106,7 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 4:11 p.m. (Nov 27, 2019)
+              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -126,7 +137,7 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 4:11 p.m. (Nov 27, 2019)
+              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       *Attention*: Last deploy was a *rollback* by j.person@example.com",
               "type": "mrkdwn",
             },
@@ -162,7 +173,7 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 4:11 p.m. (Nov 27, 2019)
+              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -219,7 +230,7 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/Acacia/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 4:11 p.m. (Nov 27, 2019)
+              "text": "Last deployed: <https://github.com/ghost/Acacia/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -238,7 +249,7 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/altair/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> about 5 hours ago at 4:11 p.m. (Nov 27, 2019)
+              "text": "Last deployed: <https://github.com/ghost/altair/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },

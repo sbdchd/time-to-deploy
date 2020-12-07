@@ -1,4 +1,4 @@
-import { formatDistance, format } from "date-fns"
+import { formatDistance, format, differenceInHours } from "date-fns"
 import { utcToZonedTime } from "date-fns-tz"
 import { GetLastDeployResponse } from "./heroku"
 import { KnownBlock } from "@slack/web-api"
@@ -8,6 +8,14 @@ import { Either, isLeft, isRight } from "fp-ts/lib/Either"
 import { flatten } from "fp-ts/lib/Array"
 import { AxiosError } from "axios"
 import { log } from "./logging"
+
+function getDateDistance(date: Date, getCurrentDate: () => Date): string {
+  const today = getCurrentDate()
+  if (Math.abs(differenceInHours(date, today)) < 24) {
+    return "Today"
+  }
+  return formatDistance(date, today, { addSuffix: true })
+}
 
 export function humanize({
   date,
@@ -20,15 +28,15 @@ export function humanize({
 }): string {
   const d = utcToZonedTime(date, timezone)
   return (
-    formatDistance(new Date(date), getCurrentDate(), { addSuffix: true }) +
+    getDateDistance(d, getCurrentDate) +
     " at " +
     format(d, "h:mm aaaa (MMM d, yyyy)")
   )
 }
 
 function getEnvsInfo(config: {
-  stagingEnvURL: string | null
-  productionEnvURL: string | null
+  readonly stagingEnvURL: string | null
+  readonly productionEnvURL: string | null
 }): string {
   if (config.stagingEnvURL != null && config.productionEnvURL != null) {
     return `• envs
