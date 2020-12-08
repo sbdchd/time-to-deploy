@@ -79,7 +79,7 @@ describe("message", () => {
     ).toMatchInlineSnapshot(`"1 day ago at 6:00 p.m. (Dec 8, 2020)"`)
 
     const d = utcToZonedTime(PAST_DATE.toISOString(), TZ)
-    const today = utcToZonedTime(CURRENT_DATE, TZ)
+    const today = utcToZonedTime(CURRENT_DATE.toISOString(), TZ)
     expect([
       { before: PAST_DATE, after: d },
       {
