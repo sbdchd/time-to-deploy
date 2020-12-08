@@ -25,7 +25,7 @@ export function humanize({
   readonly timezone: string
   readonly getCurrentDate: () => Date
 }): string {
-  const d = utcToZonedTime(date, timezone)
+  const d = utcToZonedTime(new Date(date), timezone)
   const today = utcToZonedTime(getCurrentDate(), timezone)
   return (
     getDateDistance(d, today) + " at " + format(d, "h:mm aaaa (MMM d, yyyy)")
