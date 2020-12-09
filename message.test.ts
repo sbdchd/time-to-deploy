@@ -7,7 +7,6 @@ import {
 } from "./message"
 import * as t from "io-ts"
 import { addHours, addMinutes, subDays, subHours } from "date-fns"
-import { utcToZonedTime } from "date-fns-tz"
 
 function createTestHeroku({
   isRollback,
@@ -76,28 +75,7 @@ describe("message", () => {
         timezone: TZ,
         getCurrentDate: () => CURRENT_DATE,
       }),
-    ).toMatchInlineSnapshot(`"1 day ago at 6:00 p.m. (Dec 8, 2020)"`)
-
-    const d = utcToZonedTime(PAST_DATE.toISOString(), TZ)
-    const today = utcToZonedTime(CURRENT_DATE.toISOString(), TZ)
-    expect([
-      { before: PAST_DATE, after: d },
-      {
-        before: CURRENT_DATE,
-        after: today,
-      },
-    ]).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "after": 2020-12-08T18:00:00.000Z,
-          "before": 2020-12-08T23:00:00.000Z,
-        },
-        Object {
-          "after": 2020-12-10T00:00:00.000Z,
-          "before": 2020-12-09T05:00:00.000Z,
-        },
-      ]
-    `)
+    ).toMatchInlineSnapshot(`"about 6 hours ago at 6:00 p.m. (Dec 8, 2020)"`)
 
     expect(
       humanize({
