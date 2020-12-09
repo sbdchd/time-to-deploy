@@ -1,4 +1,4 @@
-import { formatDistance, format, differenceInHours } from "date-fns"
+import { formatDistance, format, isSameDay } from "date-fns"
 import { utcToZonedTime } from "date-fns-tz"
 import { GetLastDeployResponse } from "./heroku"
 import { KnownBlock } from "@slack/web-api"
@@ -9,9 +9,8 @@ import { flatten } from "fp-ts/lib/Array"
 import { AxiosError } from "axios"
 import { log } from "./logging"
 
-function getDateDistance(date: Date, getCurrentDate: () => Date): string {
-  const today = getCurrentDate()
-  if (Math.abs(differenceInHours(date, today)) < 24) {
+function getDateDistance(date: Date, today: Date): string {
+  if (isSameDay(date, today)) {
     return "Today"
   }
   return formatDistance(date, today, { addSuffix: true })
@@ -27,10 +26,9 @@ export function humanize({
   readonly getCurrentDate: () => Date
 }): string {
   const d = utcToZonedTime(date, timezone)
+  const today = utcToZonedTime(getCurrentDate(), timezone)
   return (
-    getDateDistance(d, getCurrentDate) +
-    " at " +
-    format(d, "h:mm aaaa (MMM d, yyyy)")
+    getDateDistance(d, today) + " at " + format(d, "h:mm aaaa (MMM d, yyyy)")
   )
 }
 

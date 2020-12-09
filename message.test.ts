@@ -6,7 +6,7 @@ import {
   ProjectsSchema,
 } from "./message"
 import * as t from "io-ts"
-import { subDays } from "date-fns"
+import { addHours, addMinutes, subDays, subHours } from "date-fns"
 
 function createTestHeroku({
   isRollback,
@@ -62,6 +62,44 @@ describe("message", () => {
         getCurrentDate,
       }),
     ).toMatchInlineSnapshot(`"5 days ago at 8:00 p.m. (Oct 22, 2019)"`)
+  })
+
+  test("humanize with timezones", () => {
+    const PAST_DATE = new Date("2020-12-08T23:00:00.000Z")
+    const CURRENT_DATE = addHours(PAST_DATE, 6)
+    const TZ = "America/New_York"
+
+    expect(
+      humanize({
+        date: PAST_DATE.toISOString(),
+        timezone: TZ,
+        getCurrentDate: () => CURRENT_DATE,
+      }),
+    ).toMatchInlineSnapshot(`"about 6 hours ago at 6:00 p.m. (Dec 8, 2020)"`)
+
+    expect(
+      humanize({
+        date: PAST_DATE.toISOString(),
+        timezone: TZ,
+        getCurrentDate: () => addMinutes(PAST_DATE, 10),
+      }),
+    ).toMatchInlineSnapshot(`"Today at 6:00 p.m. (Dec 8, 2020)"`)
+
+    expect(
+      humanize({
+        date: subHours(PAST_DATE, 15).toISOString(),
+        timezone: TZ,
+        getCurrentDate: () => PAST_DATE,
+      }),
+    ).toMatchInlineSnapshot(`"Today at 3:00 a.m. (Dec 8, 2020)"`)
+
+    expect(
+      humanize({
+        date: subHours(PAST_DATE, 19).toISOString(),
+        timezone: TZ,
+        getCurrentDate: () => PAST_DATE,
+      }),
+    ).toMatchInlineSnapshot(`"about 19 hours ago at 11:00 p.m. (Dec 7, 2020)"`)
   })
 
   test("getMessage", async () => {
