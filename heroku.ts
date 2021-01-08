@@ -64,7 +64,7 @@ export function createHerokuClient(token: string) {
 
     const releaseJson = releasesRes.right
     const mostRecentSlugId = releaseJson[0].slug.id
-    const createdAt = releaseJson[0].created_at
+    const createdAt = releaseJson[0].updated_at
     const deployerEmail = releaseJson[0].user.email
     const isRollback = releaseJson[0].description
       .toLowerCase()
