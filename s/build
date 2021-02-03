@@ -7,7 +7,7 @@ main() {
     rm -rf build
     rm -f deploy.zip
     echo "compiling source files"
-    ./node_modules/.bin/esbuild index.ts --platform=node --bundle --minify --sourcemap --target=node12 --outfile=build/index.js
+    ./node_modules/.bin/esbuild src/index.ts --platform=node --bundle --minify --sourcemap --target=node12 --outfile=build/index.js
     echo "zipping source files"
     zip --recurse-paths --junk-paths --quiet deploy.zip build/index.js
     du -h deploy.zip
