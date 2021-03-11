@@ -72,6 +72,7 @@ function getBodyText({
   config,
   lastDeploySha,
   stagingSha,
+  totalCommits,
 }: {
   readonly config: {
     readonly projectName: string
@@ -81,6 +82,7 @@ function getBodyText({
   }
   readonly lastDeploySha: string | null
   readonly stagingSha: string | null
+  readonly totalCommits: number | null
 }): string {
   const diffUrl =
     lastDeploySha && stagingSha
@@ -88,11 +90,12 @@ function getBodyText({
       : null
 
   const hasChanges = lastDeploySha !== stagingSha
+  const commitsMessage = totalCommits ? `${totalCommits} commits` : ""
   return `\
 *${config.projectName}*${getDiffText({
     diffUrl,
     hasChanges,
-  })}
+  })}${commitsMessage}
 ${getEnvsInfo(config)}`
 }
 
@@ -105,6 +108,7 @@ export function getResponse(config: {
   }
   readonly repoURL: string
   readonly stagingSha: string
+  readonly totalCommits: number | null
   readonly promotionDashboardURL: string
   readonly timezone: string
   readonly projectName: string
@@ -123,6 +127,7 @@ export function getResponse(config: {
           config,
           lastDeploySha: config.lastDeploy.sha,
           stagingSha: config.stagingSha,
+          totalCommits: config.totalCommits,
         }),
       },
       accessory:
@@ -178,6 +183,7 @@ export function getFallbackMessage(config: {
           config,
           lastDeploySha: null,
           stagingSha: null,
+          totalCommits: null,
         }),
       },
       accessory: {
@@ -212,6 +218,7 @@ function getMessageOrDefault(config: {
   readonly promotionDashboardURL: string
   readonly timezone: string
   readonly stagingSha: string | null
+  readonly totalCommits: number | null
   readonly lastDeploy: {
     readonly sha: string
     readonly createdAt: string
@@ -289,12 +296,28 @@ async function getStagingSha({
   return res.right.sha
 }
 
+type GitHub = {
+  compare: (_: {
+    org: string
+    repo: string
+    base: string
+    head: string
+  }) => Promise<string | null>
+}
+
+function getOrgRepo({ url }: { readonly url: string }) {
+  // https://github.com/ghost/example/ -> [ghost, example]
+  const [org, repo] = new URL(url).pathname.split("/").filter(Boolean)
+  return [org, repo] as const
+}
+
 export async function getMessage(
   env: {
     readonly TTD_TIMEZONE: string
     readonly TTD_PROJECT_SETTINGS: string
   },
   heroku: Heroku,
+  github: GitHub,
   getCurrentDate: () => Date,
 ): Promise<KnownBlock[]> {
   const TIMEZONE = env.TTD_TIMEZONE
@@ -315,6 +338,18 @@ export async function getMessage(
           envName: settings.productionEnvName,
         }),
       ])
+
+      const [org, repo] = getOrgRepo({ url: settings.repoURL })
+
+      const totalCommits =
+        lastDeploy && stagingSha
+          ? await github.compare({
+              org,
+              repo,
+              base: stagingSha,
+              head: lastDeploy.sha,
+            })
+          : null
       return {
         projectName: settings.name,
         repoURL: settings.repoURL,
@@ -326,6 +361,7 @@ export async function getMessage(
         timezone: TIMEZONE,
         stagingSha,
         lastDeploy,
+        totalCommits,
         getCurrentDate,
       }
     }),
