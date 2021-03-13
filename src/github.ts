@@ -21,7 +21,7 @@ function generateJWT({
     // issued at time
     iat: now,
     // JWT expiration time (10 minute maximum)
-    exp: now + 10 * 60,
+    exp: now + 2 * 60,
     // GitHub App's identifier
     iss: appId,
   }
