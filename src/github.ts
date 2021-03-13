@@ -63,11 +63,23 @@ async function createAccessTokenForInstall({
 
 const CommitComparison = t.type({
   total_commits: t.number,
+  files: t.array(
+    t.type({
+      additions: t.number,
+      deletions: t.number,
+    }),
+  ),
 })
 
 function base64Decode(x: string) {
   return Buffer.from(x, "base64").toString("ascii")
 }
+
+export type Comparison = {
+  readonly totalCommits: number
+  readonly additions: number
+  readonly deletions: number
+} | null
 
 export function createGitHubClient({
   appId,
@@ -88,7 +100,7 @@ export function createGitHubClient({
     readonly repo: string
     readonly base: string
     readonly head: string
-  }): Promise<number | null> {
+  }): Promise<Comparison> {
     const jwt = generateJWT({
       appId,
       privateKey: base64Decode(privateKeyBase64),
@@ -115,7 +127,15 @@ export function createGitHubClient({
       return null
     }
 
-    return res.right.total_commits
+    const { additions, deletions } = res.right.files.reduce(
+      (acc, val) => {
+        acc.additions += val.additions
+        acc.deletions += val.deletions
+        return acc
+      },
+      { additions: 0, deletions: 0 },
+    )
+    return { totalCommits: res.right.total_commits, additions, deletions }
   }
   return { compare }
 }

@@ -8,6 +8,7 @@ import { Either, isLeft, isRight } from "fp-ts/lib/Either"
 import { flatten } from "fp-ts/lib/Array"
 import { AxiosError } from "axios"
 import { log } from "./logging"
+import { Comparison } from "./github"
 
 function getDateDistance(date: Date, today: Date): string {
   if (isSameDay(date, today)) {
@@ -55,13 +56,16 @@ function getEnvsInfo(config: {
 function getDiffText({
   diffUrl,
   hasChanges,
-  totalCommits,
+  comparison,
 }: {
   readonly hasChanges: boolean
   readonly diffUrl: string | null
-  readonly totalCommits: number | null
+  readonly comparison: Comparison
 }): string {
-  const commitsMessage = totalCommits != null ? ` ${totalCommits} commits` : ""
+  const commitsMessage =
+    comparison != null
+      ? `    ${comparison.totalCommits} commits, +${comparison.additions}, -${comparison.deletions}`
+      : ""
   if (diffUrl && hasChanges) {
     return ` — <${diffUrl}|diff (_staging..production_)>${commitsMessage}`
   }
@@ -75,7 +79,7 @@ function getBodyText({
   config,
   lastDeploySha,
   stagingSha,
-  totalCommits,
+  comparison,
 }: {
   readonly config: {
     readonly projectName: string
@@ -85,7 +89,7 @@ function getBodyText({
   }
   readonly lastDeploySha: string | null
   readonly stagingSha: string | null
-  readonly totalCommits: number | null
+  readonly comparison: Comparison
 }): string {
   const diffUrl =
     lastDeploySha && stagingSha
@@ -93,12 +97,13 @@ function getBodyText({
       : null
 
   const hasChanges = lastDeploySha !== stagingSha
-  return `\
-*${config.projectName}*${getDiffText({
+  const diffText = getDiffText({
     diffUrl,
     hasChanges,
-    totalCommits,
-  })}
+    comparison,
+  })
+  return `\
+*${config.projectName}*${diffText}
 ${getEnvsInfo(config)}`
 }
 
@@ -111,7 +116,7 @@ export function getResponse(config: {
   }
   readonly repoURL: string
   readonly stagingSha: string
-  readonly totalCommits: number | null
+  readonly comparison: Comparison
   readonly promotionDashboardURL: string
   readonly timezone: string
   readonly projectName: string
@@ -130,7 +135,7 @@ export function getResponse(config: {
           config,
           lastDeploySha: config.lastDeploy.sha,
           stagingSha: config.stagingSha,
-          totalCommits: config.totalCommits,
+          comparison: config.comparison,
         }),
       },
       accessory:
@@ -186,7 +191,7 @@ export function getFallbackMessage(config: {
           config,
           lastDeploySha: null,
           stagingSha: null,
-          totalCommits: null,
+          comparison: null,
         }),
       },
       accessory: {
@@ -221,7 +226,7 @@ function getMessageOrDefault(config: {
   readonly promotionDashboardURL: string
   readonly timezone: string
   readonly stagingSha: string | null
-  readonly totalCommits: number | null
+  readonly comparison: Comparison
   readonly lastDeploy: {
     readonly sha: string
     readonly createdAt: string
@@ -305,7 +310,7 @@ export type GitHub = {
     repo: string
     base: string
     head: string
-  }) => Promise<number | null>
+  }) => Promise<Comparison | null>
 }
 
 function getOrgRepo({ url }: { readonly url: string }) {
@@ -344,7 +349,7 @@ export async function getMessage(
 
       const [org, repo] = getOrgRepo({ url: settings.repoURL })
 
-      const totalCommits =
+      const comparison =
         lastDeploy && stagingSha
           ? await github.compare({
               org,
@@ -364,7 +369,7 @@ export async function getMessage(
         timezone: TIMEZONE,
         stagingSha,
         lastDeploy,
-        totalCommits,
+        comparison,
         getCurrentDate,
       }
     }),

@@ -7,6 +7,7 @@ import {
 } from "./message"
 import * as t from "io-ts"
 import { addHours, addMinutes, subDays, subHours } from "date-fns"
+import { Comparison } from "./github"
 
 function createTestHeroku({
   isRollback,
@@ -37,14 +38,18 @@ function createTestHeroku({
   }
 }
 
-function fakeGitHub(compareCount: number | null = 5) {
+function fakeGitHub(totalCommits: number | null = 5) {
+  const res =
+    totalCommits == null
+      ? null
+      : { totalCommits, additions: 142, deletions: 23 }
   return {
     compare: (_: {
       readonly org: string
       readonly repo: string
       readonly base: string
       readonly head: string
-    }) => Promise.resolve(compareCount),
+    }): Promise<Comparison> => Promise.resolve(res),
   }
 }
 
@@ -193,7 +198,7 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
           },
           "text": Object {
-            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)> 5 commits
+            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>    5 commits, +142, -23
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -296,7 +301,7 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/acacia",
           },
           "text": Object {
-            "text": "*Acacia* — <https://github.com/ghost/Acacia/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)> 5 commits
+            "text": "*Acacia* — <https://github.com/ghost/Acacia/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>    5 commits, +142, -23
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -325,7 +330,7 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/altair",
           },
           "text": Object {
-            "text": "*Altair* — <https://github.com/ghost/altair/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)> 5 commits
+            "text": "*Altair* — <https://github.com/ghost/altair/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>    5 commits, +142, -23
       ",
             "type": "mrkdwn",
           },

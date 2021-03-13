@@ -90,7 +90,7 @@ const github = {
     readonly repo: string
     readonly base: string
     readonly head: string
-  }) => Promise.resolve(5),
+  }) => Promise.resolve({ totalCommits: 5, additions: 152, deletions: 23 }),
 }
 
 function getCurrentDate() {
