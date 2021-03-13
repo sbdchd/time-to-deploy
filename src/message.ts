@@ -55,13 +55,13 @@ function getEnvsInfo(config: {
 function getDiffText({
   diffUrl,
   hasChanges,
-  totalCommits
+  totalCommits,
 }: {
   readonly hasChanges: boolean
   readonly diffUrl: string | null
-  readonly totalCommits: number
+  readonly totalCommits: number | null
 }): string {
-  const commitsMessage = totalCommits ? ` ${totalCommits} commits` : ""
+  const commitsMessage = totalCommits != null ? ` ${totalCommits} commits` : ""
   if (diffUrl && hasChanges) {
     return ` — <${diffUrl}|diff (_staging..production_)>${commitsMessage}`
   }
@@ -97,7 +97,7 @@ function getBodyText({
 *${config.projectName}*${getDiffText({
     diffUrl,
     hasChanges,
-    totalCommits
+    totalCommits,
   })}
 ${getEnvsInfo(config)}`
 }

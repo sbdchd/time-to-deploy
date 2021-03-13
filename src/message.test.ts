@@ -37,13 +37,15 @@ function createTestHeroku({
   }
 }
 
-const fakeGitHub = {
-  compare: (_: {
-    readonly org: string
-    readonly repo: string
-    readonly base: string
-    readonly head: string
-  }) => Promise.resolve(5),
+function fakeGitHub(compareCount: number | null = 5) {
+  return {
+    compare: (_: {
+      readonly org: string
+      readonly repo: string
+      readonly base: string
+      readonly head: string
+    }) => Promise.resolve(compareCount),
+  }
 }
 
 type ProjectSchemaType = t.TypeOf<typeof ProjectsSchema>
@@ -135,7 +137,7 @@ describe("message", () => {
       {
         getMostRecentDeployInfo: createTestHeroku({ isRollback: false }),
       },
-      fakeGitHub,
+      fakeGitHub(null),
       getCurrentDate,
     )
     expect(res).toMatchInlineSnapshot(`
@@ -151,7 +153,7 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
           },
           "text": Object {
-            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)> 5 commits
+            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -175,7 +177,7 @@ describe("message", () => {
     const rollbackRes = await getMessage(
       env,
       { getMostRecentDeployInfo: createTestHeroku({ isRollback: true }) },
-      fakeGitHub,
+      fakeGitHub(),
       getCurrentDate,
     )
     expect(rollbackRes).toMatchInlineSnapshot(`
@@ -220,7 +222,7 @@ describe("message", () => {
           noChangesToDeploy: true,
         }),
       },
-      fakeGitHub,
+      fakeGitHub(),
       getCurrentDate,
     )
     expect(noChangesRes).toMatchInlineSnapshot(`
@@ -277,7 +279,7 @@ describe("message", () => {
           isRollback: false,
         }),
       },
-      fakeGitHub,
+      fakeGitHub(),
       getCurrentDate,
     )
 
