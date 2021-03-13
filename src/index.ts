@@ -51,3 +51,7 @@ export async function handler(event: unknown) {
     getCurrentDate,
   })
 }
+
+if (require.main === module) {
+  handler(undefined)
+}

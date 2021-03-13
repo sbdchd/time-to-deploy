@@ -65,9 +65,13 @@ const CommitComparison = t.type({
   commits: t.array(t.unknown),
 })
 
+function base64Decode(x: string) {
+  return Buffer.from(x, "base64").toString("ascii")
+}
+
 export function createGitHubClient({
   appId,
-  privateKey,
+  privateKeyBase64,
   installId,
 }: {
   readonly appId: string
@@ -85,7 +89,10 @@ export function createGitHubClient({
     readonly base: string
     readonly head: string
   }): Promise<number | null> {
-    const jwt = generateJWT({ appId, privateKey: atob(privateKeyBase64) })
+    const jwt = generateJWT({
+      appId,
+      privateKey: base64Decode(privateKeyBase64),
+    })
     const token = await createAccessTokenForInstall({ installId, token: jwt })
     const res = await http({
       url: `https://api.github.com/repos/${org}/${repo}/compare/${base}...${head}`,
