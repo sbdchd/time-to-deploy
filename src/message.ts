@@ -55,15 +55,18 @@ function getEnvsInfo(config: {
 function getDiffText({
   diffUrl,
   hasChanges,
+  totalCommits
 }: {
   readonly hasChanges: boolean
   readonly diffUrl: string | null
+  readonly totalCommits: number
 }): string {
+  const commitsMessage = totalCommits ? ` ${totalCommits} commits` : ""
   if (diffUrl && hasChanges) {
-    return ` — <${diffUrl}|diff (_staging..production_)>`
+    return ` — <${diffUrl}|diff (_staging..production_)>${commitsMessage}`
   }
   if (hasChanges) {
-    return ""
+    return commitsMessage
   }
   return " — no changes"
 }
@@ -90,12 +93,12 @@ function getBodyText({
       : null
 
   const hasChanges = lastDeploySha !== stagingSha
-  const commitsMessage = totalCommits ? ` ${totalCommits} commits` : ""
   return `\
 *${config.projectName}*${getDiffText({
     diffUrl,
     hasChanges,
-  })}${commitsMessage}
+    totalCommits
+  })}
 ${getEnvsInfo(config)}`
 }
 
