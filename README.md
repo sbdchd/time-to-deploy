@@ -30,11 +30,33 @@ This Slack bot provides info about Heroku deployments including:
 
 5. At the top of the page, still under "OAuth & Permissions" select "Install App to Workspace"
 
-6. Copy the "OAuth Access Token" and save it for later. We'll need for deploying the app.
+6. Copy the "OAuth Access Token" and save it for later. We'll need for deploying the app. (`TTD_SLACK_API_TOKEN`)
 
 7. Navigate back to the "Basic Information" tab under "Settings" and
    configure the color, image, and description for the bot under "Display
    Information". Don't forget to hit "Save"!
+
+### GitHub
+
+1. Navigate to <https://github.com/settings/apps>
+
+2. Hit "New GitHub App" and provide a name and home page url (can be anything, like <https://github.com/sbdchd/time-to-deploy>)
+
+3. Scroll to the "Webhook" section and uncheck "Active"
+
+4. Scroll to "Repository permissions" and select "read-only" for "Contents"
+
+5. Scroll to bottom and click "Create GitHub App"
+
+6. Record your "App ID" (`TTD_GITHUB_APP_ID`) shown under the "About" section
+
+7. Scroll to "Private keys" and click, "Generate a private key"
+
+8. Convert the downloaded private key to base64. For example, `base64 my-app-name.2020-01-01.private-key.pem`. Use this encoded value for `TTD_GITHUB_APP_PRIVATE_KEY_BASE_64`.
+
+9. On the left hand side click "Install App". Install the app.
+
+10. Note the ID in your URL. For example, from the URL `https://github.com/settings/installations/15330603`, the installation ID would be "15330603" (`TTD_GITHUB_INSTALL_ID`).
 
 ### Deployment
 

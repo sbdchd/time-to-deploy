@@ -8,6 +8,7 @@ import { Either, isLeft, isRight } from "fp-ts/lib/Either"
 import { flatten } from "fp-ts/lib/Array"
 import { AxiosError } from "axios"
 import { log } from "./logging"
+import { Comparison } from "./github"
 
 function getDateDistance(date: Date, today: Date): string {
   if (isSameDay(date, today)) {
@@ -55,12 +56,18 @@ function getEnvsInfo(config: {
 function getDiffText({
   diffUrl,
   hasChanges,
+  comparison,
 }: {
   readonly hasChanges: boolean
   readonly diffUrl: string | null
+  readonly comparison: Comparison
 }): string {
+  const commitsMessage =
+    comparison != null
+      ? `    ${comparison.totalCommits} commits, +${comparison.additions} -${comparison.deletions} lines`
+      : ""
   if (diffUrl && hasChanges) {
-    return ` — <${diffUrl}|diff (_staging..production_)>`
+    return ` — <${diffUrl}|diff (_staging..production_)>${commitsMessage}`
   }
   if (hasChanges) {
     return ""
@@ -72,6 +79,7 @@ function getBodyText({
   config,
   lastDeploySha,
   stagingSha,
+  comparison,
 }: {
   readonly config: {
     readonly projectName: string
@@ -81,6 +89,7 @@ function getBodyText({
   }
   readonly lastDeploySha: string | null
   readonly stagingSha: string | null
+  readonly comparison: Comparison
 }): string {
   const diffUrl =
     lastDeploySha && stagingSha
@@ -88,11 +97,13 @@ function getBodyText({
       : null
 
   const hasChanges = lastDeploySha !== stagingSha
-  return `\
-*${config.projectName}*${getDiffText({
+  const diffText = getDiffText({
     diffUrl,
     hasChanges,
-  })}
+    comparison,
+  })
+  return `\
+*${config.projectName}*${diffText}
 ${getEnvsInfo(config)}`
 }
 
@@ -105,6 +116,7 @@ export function getResponse(config: {
   }
   readonly repoURL: string
   readonly stagingSha: string
+  readonly comparison: Comparison
   readonly promotionDashboardURL: string
   readonly timezone: string
   readonly projectName: string
@@ -123,6 +135,7 @@ export function getResponse(config: {
           config,
           lastDeploySha: config.lastDeploy.sha,
           stagingSha: config.stagingSha,
+          comparison: config.comparison,
         }),
       },
       accessory:
@@ -178,6 +191,7 @@ export function getFallbackMessage(config: {
           config,
           lastDeploySha: null,
           stagingSha: null,
+          comparison: null,
         }),
       },
       accessory: {
@@ -212,6 +226,7 @@ function getMessageOrDefault(config: {
   readonly promotionDashboardURL: string
   readonly timezone: string
   readonly stagingSha: string | null
+  readonly comparison: Comparison
   readonly lastDeploy: {
     readonly sha: string
     readonly createdAt: string
@@ -289,12 +304,28 @@ async function getStagingSha({
   return res.right.sha
 }
 
+export type GitHub = {
+  compare: (_: {
+    org: string
+    repo: string
+    base: string
+    head: string
+  }) => Promise<Comparison | null>
+}
+
+function getOrgRepo({ url }: { readonly url: string }) {
+  // https://github.com/ghost/example/ -> [ghost, example]
+  const [org, repo] = new URL(url).pathname.split("/").filter(Boolean)
+  return { org, repo }
+}
+
 export async function getMessage(
   env: {
     readonly TTD_TIMEZONE: string
     readonly TTD_PROJECT_SETTINGS: string
   },
   heroku: Heroku,
+  github: GitHub,
   getCurrentDate: () => Date,
 ): Promise<KnownBlock[]> {
   const TIMEZONE = env.TTD_TIMEZONE
@@ -315,6 +346,18 @@ export async function getMessage(
           envName: settings.productionEnvName,
         }),
       ])
+
+      const { org, repo } = getOrgRepo({ url: settings.repoURL })
+
+      const comparison =
+        lastDeploy && stagingSha
+          ? await github.compare({
+              org,
+              repo,
+              base: stagingSha,
+              head: lastDeploy.sha,
+            })
+          : null
       return {
         projectName: settings.name,
         repoURL: settings.repoURL,
@@ -326,6 +369,7 @@ export async function getMessage(
         timezone: TIMEZONE,
         stagingSha,
         lastDeploy,
+        comparison,
         getCurrentDate,
       }
     }),

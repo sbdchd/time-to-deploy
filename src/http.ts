@@ -13,7 +13,7 @@ export async function http<T, A, O>({
   params,
   shape,
   data,
-  headers,
+  headers = {},
 }: {
   readonly url: string
   readonly method: Method
@@ -27,7 +27,7 @@ export async function http<T, A, O>({
       url,
       method,
       params,
-      headers,
+      headers: { "User-Agent": "sbdchd/time-to-deploy", ...headers },
       data,
     })
     return shape.decode(r.data)

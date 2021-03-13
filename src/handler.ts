@@ -1,4 +1,4 @@
-import { getMessage, Heroku } from "./message"
+import { getMessage, Heroku, GitHub } from "./message"
 import * as t from "io-ts"
 import { isLeft, isRight } from "fp-ts/lib/Either"
 import startOfDay from "date-fns/startOfDay"
@@ -11,12 +11,14 @@ export async function main({
   slack,
   db,
   heroku,
+  github,
   env,
   event,
   getCurrentDate,
 }: {
   event: unknown
   slack: Slack
+  github: GitHub
   db: DB
   heroku: Heroku
   env: {
@@ -32,7 +34,7 @@ export async function main({
   const SLACK_CHANNEL_ID = env.TTD_SLACK_CHANNEL_ID
   const HTTP_AUTH_TOKEN = env.TTD_HTTP_AUTH_TOKEN
 
-  const message = await getMessage(env, heroku, getCurrentDate)
+  const message = await getMessage(env, heroku, github, getCurrentDate)
 
   log.info("Created message")
 
