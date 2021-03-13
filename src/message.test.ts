@@ -19,7 +19,7 @@ function createTestHeroku({
   const secondSha = "9c45ead4395ae80bc9a047f0a8474acc3ef93992"
 
   return async ({ envName }: { envName: string }) => {
-    if (envName === "staging") {
+    if (envName.includes("staging")) {
       const sha = noChangesToDeploy ? firstSha : secondSha
       return right({
         sha,
@@ -131,9 +131,17 @@ describe("message", () => {
     expect(res).toMatchInlineSnapshot(`
       Array [
         Object {
-          "accessory": undefined,
+          "accessory": Object {
+            "text": Object {
+              "emoji": true,
+              "text": "Promote Staging 🚢",
+              "type": "plain_text",
+            },
+            "type": "button",
+            "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
+          },
           "text": Object {
-            "text": "*Time To Deploy Project* — no changes
+            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -162,9 +170,17 @@ describe("message", () => {
     expect(rollbackRes).toMatchInlineSnapshot(`
       Array [
         Object {
-          "accessory": undefined,
+          "accessory": Object {
+            "text": Object {
+              "emoji": true,
+              "text": "Promote Staging 🚢",
+              "type": "plain_text",
+            },
+            "type": "button",
+            "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
+          },
           "text": Object {
-            "text": "*Time To Deploy Project* — no changes
+            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -255,9 +271,17 @@ describe("message", () => {
     expect(multipleEnvs).toMatchInlineSnapshot(`
       Array [
         Object {
-          "accessory": undefined,
+          "accessory": Object {
+            "text": Object {
+              "emoji": true,
+              "text": "Promote Staging 🚢",
+              "type": "plain_text",
+            },
+            "type": "button",
+            "url": "https://dashboard.heroku.com/pipelines/acacia",
+          },
           "text": Object {
-            "text": "*Acacia* — no changes
+            "text": "*Acacia* — <https://github.com/ghost/Acacia/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -276,9 +300,17 @@ describe("message", () => {
           "type": "context",
         },
         Object {
-          "accessory": undefined,
+          "accessory": Object {
+            "text": Object {
+              "emoji": true,
+              "text": "Promote Staging 🚢",
+              "type": "plain_text",
+            },
+            "type": "button",
+            "url": "https://dashboard.heroku.com/pipelines/altair",
+          },
           "text": Object {
-            "text": "*Altair* — no changes
+            "text": "*Altair* — <https://github.com/ghost/altair/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
       ",
             "type": "mrkdwn",
           },
