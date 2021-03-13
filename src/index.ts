@@ -24,7 +24,7 @@ const EnvShape = t.type({
   TTD_PROJECT_SETTINGS: t.string,
   TTD_GITHUB_APP_ID: t.string,
   TTD_GITHUB_INSTALL_ID: t.string,
-  TTD_GITHUB_APP_PRIVATE_KEY: t.string,
+  TTD_GITHUB_APP_PRIVATE_KEY_BASE_64: t.string,
 })
 
 export async function handler(event: unknown) {
@@ -43,7 +43,7 @@ export async function handler(event: unknown) {
     github: createGitHubClient({
       appId: env.right.TTD_GITHUB_APP_ID,
       installId: env.right.TTD_GITHUB_INSTALL_ID,
-      privateKey: env.right.TTD_GITHUB_APP_PRIVATE_KEY,
+      privateKeyBase64: env.right.TTD_GITHUB_APP_PRIVATE_KEY_BASE_64,
     }),
     db: createDbClient(env.right.TTD_DYNAMO_TABLE_NAME),
     env: env.right,

@@ -72,7 +72,7 @@ export function createGitHubClient({
 }: {
   readonly appId: string
   readonly installId: string
-  readonly privateKey: string
+  readonly privateKeyBase64: string
 }) {
   async function compare({
     org,
@@ -85,7 +85,7 @@ export function createGitHubClient({
     readonly base: string
     readonly head: string
   }): Promise<number | null> {
-    const jwt = generateJWT({ appId, privateKey })
+    const jwt = generateJWT({ appId, privateKey: atob(privateKeyBase64) })
     const token = await createAccessTokenForInstall({ installId, token: jwt })
     const res = await http({
       url: `https://api.github.com/repos/${org}/${repo}/compare/${base}...${head}`,
