@@ -16,7 +16,7 @@ function generateJWT({
   readonly appId: string
   readonly privateKey: string
 }): string {
-  const now = Date.now()
+  const now = Math.round(Date.now() / 1000)
   const payload = {
     // issued at time
     iat: now,
