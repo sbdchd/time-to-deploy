@@ -62,7 +62,7 @@ async function createAccessTokenForInstall({
 }
 
 const CommitComparison = t.type({
-  commits: t.array(t.unknown),
+  total_commits: t.number,
 })
 
 function base64Decode(x: string) {
@@ -93,9 +93,17 @@ export function createGitHubClient({
       appId,
       privateKey: base64Decode(privateKeyBase64),
     })
-    const token = await createAccessTokenForInstall({ installId, token: jwt })
+    const tokenRes = await createAccessTokenForInstall({
+      installId,
+      token: jwt,
+    })
+    if (isLeft(tokenRes)) {
+      log.warn("failed to create access token", tokenRes)
+      return null
+    }
+    const token: string = tokenRes.right.token
     const res = await http({
-      url: `https://api.github.com/repos/${org}/${repo}/compare/${base}...${head}`,
+      url: `https://api.github.com/repos/${org}/${repo}/compare/${head}...${base}`,
       method: "GET",
       shape: CommitComparison,
       headers: {
@@ -107,7 +115,7 @@ export function createGitHubClient({
       return null
     }
 
-    return res.right.commits.length
+    return res.right.total_commits
   }
   return { compare }
 }
