@@ -316,7 +316,7 @@ export type GitHub = {
 function getOrgRepo({ url }: { readonly url: string }) {
   // https://github.com/ghost/example/ -> [ghost, example]
   const [org, repo] = new URL(url).pathname.split("/").filter(Boolean)
-  return [org, repo] as const
+  return { org, repo }
 }
 
 export async function getMessage(
@@ -347,7 +347,7 @@ export async function getMessage(
         }),
       ])
 
-      const [org, repo] = getOrgRepo({ url: settings.repoURL })
+      const { org, repo } = getOrgRepo({ url: settings.repoURL })
 
       const comparison =
         lastDeploy && stagingSha
