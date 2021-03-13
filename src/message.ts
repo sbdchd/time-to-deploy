@@ -64,7 +64,7 @@ function getDiffText({
 }): string {
   const commitsMessage =
     comparison != null
-      ? `    ${comparison.totalCommits} commits, +${comparison.additions}, -${comparison.deletions} lines`
+      ? `    ${comparison.totalCommits} commits, +${comparison.additions} -${comparison.deletions} lines`
       : ""
   if (diffUrl && hasChanges) {
     return ` — <${diffUrl}|diff (_staging..production_)>${commitsMessage}`
