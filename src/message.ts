@@ -66,7 +66,7 @@ function getDiffText({
     return ` — <${diffUrl}|diff (_staging..production_)>${commitsMessage}`
   }
   if (hasChanges) {
-    return commitsMessage
+    return ""
   }
   return " — no changes"
 }
