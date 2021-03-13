@@ -84,17 +84,14 @@ function createFakeHeroku() {
   }
 }
 
-function createFakeGitHub() {
-  return {
-    compare: (_: {
-      readonly org: string
-      readonly repo: string
-      readonly base: string
-      readonly head: string
-    }) => Promise.resolve(5),
-  }
+const github = {
+  compare: (_: {
+    readonly org: string
+    readonly repo: string
+    readonly base: string
+    readonly head: string
+  }) => Promise.resolve(5),
 }
-const github = createFakeGitHub()
 
 function getCurrentDate() {
   return new Date("2020-12-01T17:07:02.887Z")
