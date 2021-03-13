@@ -90,7 +90,7 @@ function getBodyText({
       : null
 
   const hasChanges = lastDeploySha !== stagingSha
-  const commitsMessage = totalCommits ? `${totalCommits} commits` : ""
+  const commitsMessage = totalCommits ? ` ${totalCommits} commits` : ""
   return `\
 *${config.projectName}*${getDiffText({
     diffUrl,
@@ -296,13 +296,13 @@ async function getStagingSha({
   return res.right.sha
 }
 
-type GitHub = {
+export type GitHub = {
   compare: (_: {
     org: string
     repo: string
     base: string
     head: string
-  }) => Promise<string | null>
+  }) => Promise<number | null>
 }
 
 function getOrgRepo({ url }: { readonly url: string }) {

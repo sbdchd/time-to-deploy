@@ -84,6 +84,18 @@ function createFakeHeroku() {
   }
 }
 
+function createFakeGitHub() {
+  return {
+    compare: (_: {
+      readonly org: string
+      readonly repo: string
+      readonly base: string
+      readonly head: string
+    }) => Promise.resolve(5),
+  }
+}
+const github = createFakeGitHub()
+
 function getCurrentDate() {
   return new Date("2020-12-01T17:07:02.887Z")
 }
@@ -116,7 +128,15 @@ describe("handler:main", () => {
       source: "",
       time: "",
     }
-    await main({ event: fakeCronEvent, slack, db, heroku, env, getCurrentDate })
+    await main({
+      event: fakeCronEvent,
+      slack,
+      db,
+      heroku,
+      github,
+      env,
+      getCurrentDate,
+    })
 
     expect(slack.postMessage.calls).toHaveLength(1)
     expect(slack.updateMessage.calls).toHaveLength(0)
@@ -148,6 +168,7 @@ describe("handler:main", () => {
       slack,
       db,
       heroku,
+      github,
       env,
       getCurrentDate,
     })
@@ -173,6 +194,7 @@ describe("handler:main", () => {
       slack,
       db,
       heroku,
+      github,
       env,
       getCurrentDate,
     })

@@ -37,6 +37,15 @@ function createTestHeroku({
   }
 }
 
+const fakeGitHub = {
+  compare: (_: {
+    readonly org: string
+    readonly repo: string
+    readonly base: string
+    readonly head: string
+  }) => Promise.resolve(5),
+}
+
 type ProjectSchemaType = t.TypeOf<typeof ProjectsSchema>
 
 describe("message", () => {
@@ -126,6 +135,7 @@ describe("message", () => {
       {
         getMostRecentDeployInfo: createTestHeroku({ isRollback: false }),
       },
+      fakeGitHub,
       getCurrentDate,
     )
     expect(res).toMatchInlineSnapshot(`
@@ -165,6 +175,7 @@ describe("message", () => {
     const rollbackRes = await getMessage(
       env,
       { getMostRecentDeployInfo: createTestHeroku({ isRollback: true }) },
+      fakeGitHub,
       getCurrentDate,
     )
     expect(rollbackRes).toMatchInlineSnapshot(`
@@ -180,7 +191,7 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
           },
           "text": Object {
-            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)> 5 commits
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -209,6 +220,7 @@ describe("message", () => {
           noChangesToDeploy: true,
         }),
       },
+      fakeGitHub,
       getCurrentDate,
     )
     expect(noChangesRes).toMatchInlineSnapshot(`
@@ -216,7 +228,7 @@ describe("message", () => {
         Object {
           "accessory": undefined,
           "text": Object {
-            "text": "*Time To Deploy Project* — no changes
+            "text": "*Time To Deploy Project* — no changes 5 commits
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -265,6 +277,7 @@ describe("message", () => {
           isRollback: false,
         }),
       },
+      fakeGitHub,
       getCurrentDate,
     )
 
@@ -281,7 +294,7 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/acacia",
           },
           "text": Object {
-            "text": "*Acacia* — <https://github.com/ghost/Acacia/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+            "text": "*Acacia* — <https://github.com/ghost/Acacia/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)> 5 commits
       • envs
           ◦ <https://staging.example.com| staging>
           ◦ <https://prod.example.com| production>",
@@ -310,7 +323,7 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/altair",
           },
           "text": Object {
-            "text": "*Altair* — <https://github.com/ghost/altair/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+            "text": "*Altair* — <https://github.com/ghost/altair/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)> 5 commits
       ",
             "type": "mrkdwn",
           },

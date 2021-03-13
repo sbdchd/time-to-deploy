@@ -6,6 +6,7 @@
   "license": "AGPL-3.0-only",
   "dependencies": {
     "@slack/web-api": "^5.6.0",
+    "@types/jsonwebtoken": "^8.5.0",
     "aws-sdk": "^2.804.0",
     "axios": "^0.19.0",
     "bunyan": "^1.8.12",
@@ -13,7 +14,8 @@
     "date-fns-tz": "^1.0.8",
     "dotenv": "^8.2.0",
     "fp-ts": "^2.8.5",
-    "io-ts": "^2.2.12"
+    "io-ts": "^2.2.12",
+    "jsonwebtoken": "^8.5.1"
   },
   "scripts": {},
   "devDependencies": {
