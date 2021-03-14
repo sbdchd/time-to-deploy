@@ -44,9 +44,7 @@ export function createHerokuClient(token: string) {
     envName,
   }: {
     readonly envName: string
-  }): Promise<
-    Either<t.Errors | AxiosError<unknown> | Error, GetLastDeployResponse>
-  > {
+  }): Promise<Either<AxiosError<unknown>, GetLastDeployResponse>> {
     const releasesRes = await http({
       url: `https://api.heroku.com/apps/${envName}/releases/`,
       method: "GET",

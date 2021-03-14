@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken"
 import * as t from "io-ts"
+import * as et from "io-ts/Type"
 import { Either, isLeft } from "fp-ts/lib/Either"
 import { log } from "./logging"
 import { AxiosError } from "axios"
@@ -7,6 +8,7 @@ import uniqBy from "lodash/uniqBy"
 import sortBy from "lodash/sortBy"
 
 import { http } from "./http"
+import { notNullish } from "./message"
 
 /// Create an authentication token to make application requests.
 /// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app
@@ -41,12 +43,7 @@ async function createAccessTokenForInstall({
 }: {
   readonly installId: string
   readonly token: string
-}): Promise<
-  Either<
-    t.Errors | AxiosError<unknown> | Error,
-    t.TypeOf<typeof GitHubAccessToken>
-  >
-> {
+}): Promise<Either<AxiosError<unknown>, t.TypeOf<typeof GitHubAccessToken>>> {
   const res = await http({
     url: `https://api.github.com/app/installations/${installId}/access_tokens`,
     method: "POST",
@@ -64,10 +61,12 @@ async function createAccessTokenForInstall({
 }
 
 const Commit = t.type({
-  author: t.type({
-    login: t.string,
-    avatar_url: t.string,
-  }),
+  author: et.nullable(
+    t.type({
+      login: t.string,
+      avatar_url: t.string,
+    }),
+  ),
 })
 
 const CommitComparison = t.type({
@@ -140,10 +139,17 @@ export function createGitHubClient({
 
     const authors = sortBy(
       uniqBy(
-        res.right.commits.map(x => ({
-          login: x.author.login,
-          avatarUrl: x.author.avatar_url,
-        })),
+        res.right.commits
+          .map(x => {
+            if (x.author == null) {
+              return null
+            }
+            return {
+              login: x.author.login,
+              avatarUrl: x.author.avatar_url,
+            }
+          })
+          .filter(notNullish),
         u => u.login,
       ),
       u => u.login,

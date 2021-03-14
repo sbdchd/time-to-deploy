@@ -15,6 +15,7 @@
     "dotenv": "^8.2.0",
     "fp-ts": "^2.8.5",
     "io-ts": "^2.2.12",
+    "io-ts-types": "^0.5.15",
     "jsonwebtoken": "^8.5.1"
   },
   "scripts": {},

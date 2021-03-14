@@ -178,7 +178,7 @@ export function getResponse(config: {
       elements: [
         {
           type: "mrkdwn",
-          text: `${environments}Last deployed: <${lastDeployUrl}|${config.lastDeploy.sha.slice(
+          text: `${environments}last deployed: <${lastDeployUrl}|${config.lastDeploy.sha.slice(
             0,
             7,
           )}> ${humanize({
@@ -240,7 +240,7 @@ export const ProjectsSchema = t.array(
   }),
 )
 
-function notNullish<T>(x: null | undefined | T): x is T {
+export function notNullish<T>(x: null | undefined | T): x is T {
   return x != null
 }
 

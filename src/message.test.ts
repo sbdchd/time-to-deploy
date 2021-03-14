@@ -181,7 +181,7 @@ describe("message", () => {
           "elements": Array [
             Object {
               "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
-      Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+      last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -240,7 +240,7 @@ describe("message", () => {
           "elements": Array [
             Object {
               "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
-      Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+      last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       *Attention*: Last deploy was a *rollback* by j.person@example.com",
               "type": "mrkdwn",
             },
@@ -295,7 +295,7 @@ describe("message", () => {
           "elements": Array [
             Object {
               "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
-      Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+      last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -380,7 +380,7 @@ describe("message", () => {
           "elements": Array [
             Object {
               "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
-      Last deployed: <https://github.com/ghost/Acacia/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+      last deployed: <https://github.com/ghost/Acacia/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -427,7 +427,7 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/altair/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+              "text": "last deployed: <https://github.com/ghost/altair/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
