@@ -3,6 +3,8 @@ import * as t from "io-ts"
 import { Either, isLeft } from "fp-ts/lib/Either"
 import { log } from "./logging"
 import { AxiosError } from "axios"
+import uniqBy from "lodash/uniqBy"
+import sortBy from "lodash/sortBy"
 
 import { http } from "./http"
 
@@ -61,8 +63,16 @@ async function createAccessTokenForInstall({
   return res
 }
 
+const Commit = t.type({
+  author: t.type({
+    login: t.string,
+    avatar_url: t.string,
+  }),
+})
+
 const CommitComparison = t.type({
   total_commits: t.number,
+  commits: t.array(Commit),
   files: t.array(
     t.type({
       additions: t.number,
@@ -79,6 +89,7 @@ export type Comparison = {
   readonly totalCommits: number
   readonly additions: number
   readonly deletions: number
+  readonly authors: { readonly login: string; readonly avatarUrl: string }[]
 } | null
 
 export function createGitHubClient({
@@ -127,6 +138,17 @@ export function createGitHubClient({
       return null
     }
 
+    const authors = sortBy(
+      uniqBy(
+        res.right.commits.map(x => ({
+          login: x.author.login,
+          avatarUrl: x.author.avatar_url,
+        })),
+        u => u.login,
+      ),
+      u => u.login,
+    )
+
     const { additions, deletions } = res.right.files.reduce(
       (acc, val) => {
         acc.additions += val.additions
@@ -135,7 +157,12 @@ export function createGitHubClient({
       },
       { additions: 0, deletions: 0 },
     )
-    return { totalCommits: res.right.total_commits, additions, deletions }
+    return {
+      totalCommits: res.right.total_commits,
+      authors,
+      additions,
+      deletions,
+    }
   }
   return { compare }
 }

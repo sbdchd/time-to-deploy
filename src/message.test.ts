@@ -42,7 +42,21 @@ function fakeGitHub(totalCommits: number | null = 5) {
   const res =
     totalCommits == null
       ? null
-      : { totalCommits, additions: 142, deletions: 23 }
+      : {
+          totalCommits,
+          authors: [
+            {
+              login: "chdsbd",
+              avatarUrl: "https://avatars.githubusercontent.com/u/1929960",
+            },
+            {
+              login: "sbdchd",
+              avatarUrl: "https://avatars.githubusercontent.com/u/7340772",
+            },
+          ],
+          additions: 142,
+          deletions: 23,
+        }
   return {
     compare: (_: {
       readonly org: string
