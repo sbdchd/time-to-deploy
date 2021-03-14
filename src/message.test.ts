@@ -42,7 +42,21 @@ function fakeGitHub(totalCommits: number | null = 5) {
   const res =
     totalCommits == null
       ? null
-      : { totalCommits, additions: 142, deletions: 23 }
+      : {
+          totalCommits,
+          authors: [
+            {
+              login: "chdsbd",
+              avatarUrl: "https://avatars.githubusercontent.com/u/1929960",
+            },
+            {
+              login: "sbdchd",
+              avatarUrl: "https://avatars.githubusercontent.com/u/7340772",
+            },
+          ],
+          additions: 142,
+          deletions: 23,
+        }
   return {
     compare: (_: {
       readonly org: string
@@ -158,10 +172,7 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
           },
           "text": Object {
-            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
-      • envs
-          ◦ <https://staging.example.com| staging>
-          ◦ <https://prod.example.com| production>",
+            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -169,7 +180,8 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+              "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
+      last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -198,10 +210,8 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
           },
           "text": Object {
-            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>    5 commits, +142 -23 lines
-      • envs
-          ◦ <https://staging.example.com| staging>
-          ◦ <https://prod.example.com| production>",
+            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+      5 commits, +142 -23 lines",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -209,7 +219,28 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+              "alt_text": "chdsbd",
+              "image_url": "https://avatars.githubusercontent.com/u/1929960",
+              "type": "image",
+            },
+            Object {
+              "alt_text": "sbdchd",
+              "image_url": "https://avatars.githubusercontent.com/u/7340772",
+              "type": "image",
+            },
+            Object {
+              "emoji": true,
+              "text": "2 authors",
+              "type": "plain_text",
+            },
+          ],
+          "type": "context",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
+      last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       *Attention*: Last deploy was a *rollback* by j.person@example.com",
               "type": "mrkdwn",
             },
@@ -235,10 +266,7 @@ describe("message", () => {
         Object {
           "accessory": undefined,
           "text": Object {
-            "text": "*Time To Deploy Project* — no changes
-      • envs
-          ◦ <https://staging.example.com| staging>
-          ◦ <https://prod.example.com| production>",
+            "text": "*Time To Deploy Project* — no changes",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -246,7 +274,28 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+              "alt_text": "chdsbd",
+              "image_url": "https://avatars.githubusercontent.com/u/1929960",
+              "type": "image",
+            },
+            Object {
+              "alt_text": "sbdchd",
+              "image_url": "https://avatars.githubusercontent.com/u/7340772",
+              "type": "image",
+            },
+            Object {
+              "emoji": true,
+              "text": "2 authors",
+              "type": "plain_text",
+            },
+          ],
+          "type": "context",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
+      last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -301,10 +350,8 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/acacia",
           },
           "text": Object {
-            "text": "*Acacia* — <https://github.com/ghost/Acacia/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>    5 commits, +142 -23 lines
-      • envs
-          ◦ <https://staging.example.com| staging>
-          ◦ <https://prod.example.com| production>",
+            "text": "*Acacia* — <https://github.com/ghost/Acacia/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+      5 commits, +142 -23 lines",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -312,7 +359,28 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/Acacia/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+              "alt_text": "chdsbd",
+              "image_url": "https://avatars.githubusercontent.com/u/1929960",
+              "type": "image",
+            },
+            Object {
+              "alt_text": "sbdchd",
+              "image_url": "https://avatars.githubusercontent.com/u/7340772",
+              "type": "image",
+            },
+            Object {
+              "emoji": true,
+              "text": "2 authors",
+              "type": "plain_text",
+            },
+          ],
+          "type": "context",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
+      last deployed: <https://github.com/ghost/Acacia/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -330,8 +398,8 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/altair",
           },
           "text": Object {
-            "text": "*Altair* — <https://github.com/ghost/altair/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>    5 commits, +142 -23 lines
-      ",
+            "text": "*Altair* — <https://github.com/ghost/altair/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+      5 commits, +142 -23 lines",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -339,7 +407,27 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/altair/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+              "alt_text": "chdsbd",
+              "image_url": "https://avatars.githubusercontent.com/u/1929960",
+              "type": "image",
+            },
+            Object {
+              "alt_text": "sbdchd",
+              "image_url": "https://avatars.githubusercontent.com/u/7340772",
+              "type": "image",
+            },
+            Object {
+              "emoji": true,
+              "text": "2 authors",
+              "type": "plain_text",
+            },
+          ],
+          "type": "context",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "last deployed: <https://github.com/ghost/altair/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -374,10 +462,7 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com",
           },
           "text": Object {
-            "text": "*Time To Deploy Project* — no changes
-      • envs
-          ◦ <https://staging.example.com| staging>
-          ◦ <https://prod.example.com| production>",
+            "text": "*Time To Deploy Project* — no changes",
             "type": "mrkdwn",
           },
           "type": "section",

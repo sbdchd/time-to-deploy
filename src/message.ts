@@ -37,20 +37,17 @@ function getEnvsInfo(config: {
   readonly stagingEnvURL: string | null
   readonly productionEnvURL: string | null
 }): string {
-  if (config.stagingEnvURL != null && config.productionEnvURL != null) {
-    return `• envs
-    ◦ <${config.stagingEnvURL}| staging>
-    ◦ <${config.productionEnvURL}| production>`
+  const envs = [
+    { env: "staging", url: config.stagingEnvURL },
+    { env: "production", url: config.productionEnvURL },
+  ]
+    .filter(x => x.url != null)
+    .map(x => `<${x.url}| ${x.env}>`)
+    .join(", ")
+  if (!envs) {
+    return ""
   }
-  if (config.stagingEnvURL != null) {
-    return `• envs
-    ◦ <${config.stagingEnvURL}| staging>`
-  }
-  if (config.productionEnvURL != null) {
-    return `• envs
-    ◦ <${config.productionEnvURL}| production>`
-  }
-  return ""
+  return `environments: ${envs}\n`
 }
 
 function getDiffText({
@@ -64,7 +61,7 @@ function getDiffText({
 }): string {
   const commitsMessage =
     comparison != null
-      ? `    ${comparison.totalCommits} commits, +${comparison.additions} -${comparison.deletions} lines`
+      ? `\n${comparison.totalCommits} commits, +${comparison.additions} -${comparison.deletions} lines`
       : ""
   if (diffUrl && hasChanges) {
     return ` — <${diffUrl}|diff (_staging..production_)>${commitsMessage}`
@@ -84,8 +81,6 @@ function getBodyText({
   readonly config: {
     readonly projectName: string
     readonly repoURL: string
-    readonly stagingEnvURL: string | null
-    readonly productionEnvURL: string | null
   }
   readonly lastDeploySha: string | null
   readonly stagingSha: string | null
@@ -103,8 +98,33 @@ function getBodyText({
     comparison,
   })
   return `\
-*${config.projectName}*${diffText}
-${getEnvsInfo(config)}`
+*${config.projectName}*${diffText}`
+}
+
+function getAuthors(comparison: Comparison): KnownBlock | null {
+  if (!comparison || comparison.authors.length === 0) {
+    return null
+  }
+  // We can have at most 10 items in a Slack "context" block, so we need to
+  // slice our avatars.
+  let authors = comparison.authors
+    .map(x => ({
+      type: "image" as const,
+      image_url: x.avatarUrl,
+      alt_text: x.login,
+    }))
+    .slice(0, 9)
+  return {
+    type: "context",
+    elements: [
+      ...authors,
+      {
+        type: "plain_text",
+        emoji: true,
+        text: `${comparison.authors.length} authors`,
+      },
+    ],
+  }
 }
 
 export function getResponse(config: {
@@ -123,9 +143,11 @@ export function getResponse(config: {
   readonly stagingEnvURL: string | null
   readonly productionEnvURL: string | null
   readonly getCurrentDate: () => Date
-}): Array<KnownBlock> {
+}): Array<KnownBlock | null> {
   const lastDeployUrl = `${config.repoURL}/commit/${config.lastDeploy.sha}/`
 
+  const environments = getEnvsInfo(config)
+  const authors = getAuthors(config.comparison)
   return [
     {
       type: "section",
@@ -151,12 +173,13 @@ export function getResponse(config: {
             }
           : undefined,
     },
+    authors,
     {
       type: "context",
       elements: [
         {
           type: "mrkdwn",
-          text: `Last deployed: <${lastDeployUrl}|${config.lastDeploy.sha.slice(
+          text: `${environments}last deployed: <${lastDeployUrl}|${config.lastDeploy.sha.slice(
             0,
             7,
           )}> ${humanize({
@@ -218,6 +241,10 @@ export const ProjectsSchema = t.array(
   }),
 )
 
+export function notNullish<T>(x: null | undefined | T): x is T {
+  return x != null
+}
+
 function getMessageOrDefault(config: {
   readonly projectName: string
   readonly repoURL: string
@@ -242,7 +269,7 @@ function getMessageOrDefault(config: {
     ...config,
     lastDeploy: config.lastDeploy,
     stagingSha: config.stagingSha,
-  })
+  }).filter(notNullish)
 }
 
 function getProjectSettings(env: { readonly TTD_PROJECT_SETTINGS: string }) {
