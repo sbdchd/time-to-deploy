@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios"
 import { Either, left } from "fp-ts/lib/Either"
 import { isRight } from "fp-ts/lib/These"
 import * as t from "io-ts"
+import { PathReporter } from "io-ts/lib/PathReporter"
 const baseHttp = axios.create({ timeout: 3000 })
 import { log } from "./logging"
 
@@ -36,7 +37,10 @@ export async function http<T, A, O>({
     if (isRight(parsed)) {
       return parsed
     }
-    log.warn({ violations: parsed.left }, "failed to parse schema")
+    log.warn(
+      { violations: PathReporter.report(parsed) },
+      "failed to parse schema",
+    )
     throw new Error("Failed to parse schema")
   } catch (e: unknown) {
     if (
