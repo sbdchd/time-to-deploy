@@ -43,7 +43,12 @@ async function createAccessTokenForInstall({
 }: {
   readonly installId: string
   readonly token: string
-}): Promise<Either<AxiosError<unknown>, t.TypeOf<typeof GitHubAccessToken>>> {
+}): Promise<
+  Either<
+    t.Errors | AxiosError<unknown> | Error,
+    t.TypeOf<typeof GitHubAccessToken>
+  >
+> {
   const res = await http({
     url: `https://api.github.com/app/installations/${installId}/access_tokens`,
     method: "POST",
