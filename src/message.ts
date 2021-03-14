@@ -37,20 +37,17 @@ function getEnvsInfo(config: {
   readonly stagingEnvURL: string | null
   readonly productionEnvURL: string | null
 }): string {
-  if (config.stagingEnvURL != null && config.productionEnvURL != null) {
-    return `• envs
-    ◦ <${config.stagingEnvURL}| staging>
-    ◦ <${config.productionEnvURL}| production>`
+  const envs = [
+    { env: "staging", url: config.stagingEnvURL },
+    { env: "production", url: config.productionEnvURL },
+  ]
+    .filter(x => x.url != null)
+    .map(x => `<${x.url}| ${x.env}`)
+    .join(", ")
+  if (!envs) {
+    return ""
   }
-  if (config.stagingEnvURL != null) {
-    return `• envs
-    ◦ <${config.stagingEnvURL}| staging>`
-  }
-  if (config.productionEnvURL != null) {
-    return `• envs
-    ◦ <${config.productionEnvURL}| production>`
-  }
-  return ""
+  return `environments: ${envs}\n`
 }
 
 function getDiffText({
@@ -64,7 +61,7 @@ function getDiffText({
 }): string {
   const commitsMessage =
     comparison != null
-      ? `    ${comparison.totalCommits} commits, +${comparison.additions} -${comparison.deletions} lines`
+      ? `\n${comparison.totalCommits} commits, +${comparison.additions} -${comparison.deletions} lines`
       : ""
   if (diffUrl && hasChanges) {
     return ` — <${diffUrl}|diff (_staging..production_)>${commitsMessage}`
@@ -84,8 +81,6 @@ function getBodyText({
   readonly config: {
     readonly projectName: string
     readonly repoURL: string
-    readonly stagingEnvURL: string | null
-    readonly productionEnvURL: string | null
   }
   readonly lastDeploySha: string | null
   readonly stagingSha: string | null
@@ -103,8 +98,7 @@ function getBodyText({
     comparison,
   })
   return `\
-*${config.projectName}*${diffText}
-${getEnvsInfo(config)}`
+*${config.projectName}*${diffText}`
 }
 
 export function getResponse(config: {
@@ -126,6 +120,7 @@ export function getResponse(config: {
 }): Array<KnownBlock> {
   const lastDeployUrl = `${config.repoURL}/commit/${config.lastDeploy.sha}/`
 
+  const environments = getEnvsInfo(config)
   return [
     {
       type: "section",
@@ -156,7 +151,7 @@ export function getResponse(config: {
       elements: [
         {
           type: "mrkdwn",
-          text: `Last deployed: <${lastDeployUrl}|${config.lastDeploy.sha.slice(
+          text: `${environments}Last deployed: <${lastDeployUrl}|${config.lastDeploy.sha.slice(
             0,
             7,
           )}> ${humanize({

@@ -158,10 +158,7 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
           },
           "text": Object {
-            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
-      • envs
-          ◦ <https://staging.example.com| staging>
-          ◦ <https://prod.example.com| production>",
+            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -169,7 +166,8 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+              "text": "environments: <https://staging.example.com| staging, <https://prod.example.com| production
+      Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -198,10 +196,8 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
           },
           "text": Object {
-            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>    5 commits, +142 -23 lines
-      • envs
-          ◦ <https://staging.example.com| staging>
-          ◦ <https://prod.example.com| production>",
+            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+      5 commits, +142 -23 lines",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -209,7 +205,8 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+              "text": "environments: <https://staging.example.com| staging, <https://prod.example.com| production
+      Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       *Attention*: Last deploy was a *rollback* by j.person@example.com",
               "type": "mrkdwn",
             },
@@ -235,10 +232,7 @@ describe("message", () => {
         Object {
           "accessory": undefined,
           "text": Object {
-            "text": "*Time To Deploy Project* — no changes
-      • envs
-          ◦ <https://staging.example.com| staging>
-          ◦ <https://prod.example.com| production>",
+            "text": "*Time To Deploy Project* — no changes",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -246,7 +240,8 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+              "text": "environments: <https://staging.example.com| staging, <https://prod.example.com| production
+      Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -301,10 +296,8 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/acacia",
           },
           "text": Object {
-            "text": "*Acacia* — <https://github.com/ghost/Acacia/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>    5 commits, +142 -23 lines
-      • envs
-          ◦ <https://staging.example.com| staging>
-          ◦ <https://prod.example.com| production>",
+            "text": "*Acacia* — <https://github.com/ghost/Acacia/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+      5 commits, +142 -23 lines",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -312,7 +305,8 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "Last deployed: <https://github.com/ghost/Acacia/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+              "text": "environments: <https://staging.example.com| staging, <https://prod.example.com| production
+      Last deployed: <https://github.com/ghost/Acacia/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },
@@ -330,8 +324,8 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com/pipelines/altair",
           },
           "text": Object {
-            "text": "*Altair* — <https://github.com/ghost/altair/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>    5 commits, +142 -23 lines
-      ",
+            "text": "*Altair* — <https://github.com/ghost/altair/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+      5 commits, +142 -23 lines",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -374,10 +368,7 @@ describe("message", () => {
             "url": "https://dashboard.heroku.com",
           },
           "text": Object {
-            "text": "*Time To Deploy Project* — no changes
-      • envs
-          ◦ <https://staging.example.com| staging>
-          ◦ <https://prod.example.com| production>",
+            "text": "*Time To Deploy Project* — no changes",
             "type": "mrkdwn",
           },
           "type": "section",
