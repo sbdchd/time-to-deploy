@@ -7,6 +7,10 @@ import { createGitHubClient } from "./github"
 import { main } from "./handler"
 import * as t from "io-ts"
 import { isLeft } from "fp-ts/lib/Either"
+import { PathReporter } from "io-ts/lib/PathReporter"
+import * as Sentry from "@sentry/node"
+
+Sentry.init({ debug: true })
 
 dotenv.config()
 
@@ -33,7 +37,7 @@ export async function handler(event: unknown) {
   const env = EnvShape.decode(process.env)
 
   if (isLeft(env)) {
-    log.error("problem parsing env", env)
+    log.error({ violations: PathReporter.report(env) }, "problem parsing env")
     return
   }
 
