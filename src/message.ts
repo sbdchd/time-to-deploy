@@ -105,7 +105,8 @@ function getAuthors(comparison: Comparison): KnownBlock | null {
   if (!comparison || comparison.authors.length === 0) {
     return null
   }
-
+  // We can have at most 10 items in a Slack "context" block, so we need to
+  // slice our avatars.
   let authors = comparison.authors
     .map(x => ({
       type: "image" as const,
