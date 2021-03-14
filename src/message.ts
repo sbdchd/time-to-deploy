@@ -42,7 +42,7 @@ function getEnvsInfo(config: {
     { env: "production", url: config.productionEnvURL },
   ]
     .filter(x => x.url != null)
-    .map(x => `<${x.url}| ${x.env}`)
+    .map(x => `<${x.url}| ${x.env}>`)
     .join(", ")
   if (!envs) {
     return ""
@@ -101,6 +101,31 @@ function getBodyText({
 *${config.projectName}*${diffText}`
 }
 
+function getAuthors(comparison: Comparison): KnownBlock | null {
+  if (!comparison || comparison.authors.length === 0) {
+    return null
+  }
+
+  let authors = comparison.authors
+    .map(x => ({
+      type: "image" as const,
+      image_url: x.avatarUrl,
+      alt_text: x.login,
+    }))
+    .slice(0, 9)
+  return {
+    type: "context",
+    elements: [
+      ...authors,
+      {
+        type: "plain_text",
+        emoji: true,
+        text: `${comparison.authors.length} authors`,
+      },
+    ],
+  }
+}
+
 export function getResponse(config: {
   readonly lastDeploy: {
     readonly sha: string
@@ -117,10 +142,11 @@ export function getResponse(config: {
   readonly stagingEnvURL: string | null
   readonly productionEnvURL: string | null
   readonly getCurrentDate: () => Date
-}): Array<KnownBlock> {
+}): Array<KnownBlock | null> {
   const lastDeployUrl = `${config.repoURL}/commit/${config.lastDeploy.sha}/`
 
   const environments = getEnvsInfo(config)
+  const authors = getAuthors(config.comparison)
   return [
     {
       type: "section",
@@ -146,6 +172,7 @@ export function getResponse(config: {
             }
           : undefined,
     },
+    authors,
     {
       type: "context",
       elements: [
@@ -213,6 +240,10 @@ export const ProjectsSchema = t.array(
   }),
 )
 
+function notNullish<T>(x: null | undefined | T): x is T {
+  return x != null
+}
+
 function getMessageOrDefault(config: {
   readonly projectName: string
   readonly repoURL: string
@@ -237,7 +268,7 @@ function getMessageOrDefault(config: {
     ...config,
     lastDeploy: config.lastDeploy,
     stagingSha: config.stagingSha,
-  })
+  }).filter(notNullish)
 }
 
 function getProjectSettings(env: { readonly TTD_PROJECT_SETTINGS: string }) {

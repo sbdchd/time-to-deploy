@@ -180,7 +180,7 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "environments: <https://staging.example.com| staging, <https://prod.example.com| production
+              "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
       Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
@@ -219,7 +219,27 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "environments: <https://staging.example.com| staging, <https://prod.example.com| production
+              "alt_text": "chdsbd",
+              "image_url": "https://avatars.githubusercontent.com/u/1929960",
+              "type": "image",
+            },
+            Object {
+              "alt_text": "sbdchd",
+              "image_url": "https://avatars.githubusercontent.com/u/7340772",
+              "type": "image",
+            },
+            Object {
+              "emoji": true,
+              "text": "2 authors",
+              "type": "plain_text",
+            },
+          ],
+          "type": "context",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
       Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       *Attention*: Last deploy was a *rollback* by j.person@example.com",
               "type": "mrkdwn",
@@ -254,7 +274,27 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "environments: <https://staging.example.com| staging, <https://prod.example.com| production
+              "alt_text": "chdsbd",
+              "image_url": "https://avatars.githubusercontent.com/u/1929960",
+              "type": "image",
+            },
+            Object {
+              "alt_text": "sbdchd",
+              "image_url": "https://avatars.githubusercontent.com/u/7340772",
+              "type": "image",
+            },
+            Object {
+              "emoji": true,
+              "text": "2 authors",
+              "type": "plain_text",
+            },
+          ],
+          "type": "context",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
       Last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
@@ -319,7 +359,27 @@ describe("message", () => {
         Object {
           "elements": Array [
             Object {
-              "text": "environments: <https://staging.example.com| staging, <https://prod.example.com| production
+              "alt_text": "chdsbd",
+              "image_url": "https://avatars.githubusercontent.com/u/1929960",
+              "type": "image",
+            },
+            Object {
+              "alt_text": "sbdchd",
+              "image_url": "https://avatars.githubusercontent.com/u/7340772",
+              "type": "image",
+            },
+            Object {
+              "emoji": true,
+              "text": "2 authors",
+              "type": "plain_text",
+            },
+          ],
+          "type": "context",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
       Last deployed: <https://github.com/ghost/Acacia/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
@@ -343,6 +403,26 @@ describe("message", () => {
             "type": "mrkdwn",
           },
           "type": "section",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "alt_text": "chdsbd",
+              "image_url": "https://avatars.githubusercontent.com/u/1929960",
+              "type": "image",
+            },
+            Object {
+              "alt_text": "sbdchd",
+              "image_url": "https://avatars.githubusercontent.com/u/7340772",
+              "type": "image",
+            },
+            Object {
+              "emoji": true,
+              "text": "2 authors",
+              "type": "plain_text",
+            },
+          ],
+          "type": "context",
         },
         Object {
           "elements": Array [
