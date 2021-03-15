@@ -5,6 +5,8 @@
   "author": "Steve Dignam <steve@dignam.xyz>",
   "license": "AGPL-3.0-only",
   "dependencies": {
+    "@sentry/node": "^6.2.2",
+    "@sentry/tracing": "^6.2.2",
     "@slack/web-api": "^5.6.0",
     "@types/jsonwebtoken": "^8.5.0",
     "aws-sdk": "^2.804.0",
@@ -16,7 +18,9 @@
     "fp-ts": "^2.8.5",
     "io-ts": "^2.2.12",
     "io-ts-types": "^0.5.15",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^8.5.1",
+    "monocle-ts": "^2.3.9",
+    "newtype-ts": "^0.3.4"
   },
   "scripts": {},
   "devDependencies": {
