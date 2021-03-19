@@ -38,36 +38,53 @@ function createTestHeroku({
   }
 }
 
-function fakeGitHub(totalCommits: number | null = 5) {
-  const res =
-    totalCommits == null
-      ? null
-      : {
-          totalCommits,
-          authors: [
-            {
-              login: "chdsbd",
-              avatarUrl: "https://avatars.githubusercontent.com/u/1929960",
-            },
-            {
-              login: "sbdchd",
-              avatarUrl: "https://avatars.githubusercontent.com/u/7340772",
-            },
-          ],
-          additions: 142,
-          deletions: 23,
-        }
+const fakeGithubResponse: Comparison = {
+  totalCommits: 5,
+  authors: [
+    {
+      login: "chdsbd",
+      avatarUrl: "https://avatars.githubusercontent.com/u/1929960",
+    },
+    {
+      login: "sbdchd",
+      avatarUrl: "https://avatars.githubusercontent.com/u/7340772",
+    },
+  ],
+  additions: 142,
+  deletions: 23,
+}
+
+function fakeGitHub(comparision: Comparison = fakeGithubResponse) {
   return {
-    compare: (_: {
+    compare: async (_: {
       readonly org: string
       readonly repo: string
       readonly base: string
       readonly head: string
-    }): Promise<Comparison> => Promise.resolve(res),
+    }): Promise<Comparison> => comparision,
   }
 }
 
 type ProjectSchemaType = t.TypeOf<typeof ProjectsSchema>
+
+const getCurrentDate = () => new Date("2019-11-28T02:00:00Z")
+
+const projectSettings: ProjectSchemaType = [
+  {
+    name: "Time To Deploy Project",
+    repoURL: "https://github.com/ghost/time-to-deploy",
+    stagingEnvURL: "https://staging.example.com",
+    productionEnvURL: "https://prod.example.com",
+    stagingEnvName: "staging name",
+    productionEnvName: "production name",
+  },
+]
+
+const env = {
+  TTD_PROJECT_SETTINGS: JSON.stringify(projectSettings),
+  TTD_HEROKU_API_TOKEN: "fake-heroku-api-token",
+  TTD_TIMEZONE: "America/New_York",
+}
 
 describe("message", () => {
   test("humanize", () => {
@@ -133,24 +150,6 @@ describe("message", () => {
   })
 
   test("getMessage", async () => {
-    const getCurrentDate = () => new Date("2019-11-28T02:00:00Z")
-
-    const projectSettings: ProjectSchemaType = [
-      {
-        name: "Time To Deploy Project",
-        repoURL: "https://github.com/ghost/time-to-deploy",
-        stagingEnvURL: "https://staging.example.com",
-        productionEnvURL: "https://prod.example.com",
-        stagingEnvName: "staging name",
-        productionEnvName: "production name",
-      },
-    ]
-
-    const env = {
-      TTD_PROJECT_SETTINGS: JSON.stringify(projectSettings),
-      TTD_HEROKU_API_TOKEN: "fake-heroku-api-token",
-      TTD_TIMEZONE: "America/New_York",
-    }
     const res = await getMessage(
       env,
       {
@@ -428,6 +427,75 @@ describe("message", () => {
           "elements": Array [
             Object {
               "text": "last deployed: <https://github.com/ghost/altair/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+      ",
+              "type": "mrkdwn",
+            },
+          ],
+          "type": "context",
+        },
+      ]
+    `)
+  })
+
+  test("plural vs singular message", async () => {
+    const noChangesRes = await getMessage(
+      env,
+      {
+        getMostRecentDeployInfo: createTestHeroku({
+          isRollback: false,
+        }),
+      },
+      fakeGitHub({
+        ...fakeGithubResponse,
+        totalCommits: 1,
+        authors: [
+          {
+            login: "ghost",
+            avatarUrl: "https://example.org/u/ghost",
+          },
+        ],
+      }),
+      getCurrentDate,
+    )
+    expect(noChangesRes).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "accessory": Object {
+            "text": Object {
+              "emoji": true,
+              "text": "Promote Staging 🚢",
+              "type": "plain_text",
+            },
+            "type": "button",
+            "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
+          },
+          "text": Object {
+            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+      1 commit, +142 -23 lines",
+            "type": "mrkdwn",
+          },
+          "type": "section",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "alt_text": "ghost",
+              "image_url": "https://example.org/u/ghost",
+              "type": "image",
+            },
+            Object {
+              "emoji": true,
+              "text": "1 author",
+              "type": "plain_text",
+            },
+          ],
+          "type": "context",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
+      last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
       ",
               "type": "mrkdwn",
             },

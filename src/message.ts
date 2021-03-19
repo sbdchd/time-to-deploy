@@ -50,6 +50,13 @@ function getEnvsInfo(config: {
   return `environments: ${envs}\n`
 }
 
+function pluralize(singular: string, count: number): string {
+  if (count === 1) {
+    return singular
+  }
+  return singular + "s"
+}
+
 function getDiffText({
   diffUrl,
   hasChanges,
@@ -61,7 +68,10 @@ function getDiffText({
 }): string {
   const commitsMessage =
     comparison != null
-      ? `\n${comparison.totalCommits} commits, +${comparison.additions} -${comparison.deletions} lines`
+      ? `\n${comparison.totalCommits} ${pluralize(
+          "commit",
+          comparison.totalCommits,
+        )}, +${comparison.additions} -${comparison.deletions} lines`
       : ""
   if (diffUrl && hasChanges) {
     return ` — <${diffUrl}|diff (_staging..production_)>${commitsMessage}`
@@ -121,7 +131,10 @@ function getAuthors(comparison: Comparison): KnownBlock | null {
       {
         type: "plain_text",
         emoji: true,
-        text: `${comparison.authors.length} authors`,
+        text: `${comparison.authors.length} ${pluralize(
+          "author",
+          comparison.authors.length,
+        )}`,
       },
     ],
   }
