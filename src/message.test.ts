@@ -9,13 +9,15 @@ import * as t from "io-ts"
 import { addHours, addMinutes, subDays, subHours } from "date-fns"
 import { Comparison } from "./github"
 
-function createTestHeroku({
-  isRollback,
-  noChangesToDeploy = false,
-}: {
-  readonly isRollback: boolean
-  readonly noChangesToDeploy?: boolean
-}) {
+function createTestHeroku(
+  {
+    isRollback = false,
+    noChangesToDeploy = false,
+  }: {
+    readonly isRollback?: boolean
+    readonly noChangesToDeploy?: boolean
+  } = { isRollback: false, noChangesToDeploy: false },
+) {
   const firstSha = "a8f68d19a290ad8a7eb19019de6ca58cecb444ce"
   const secondSha = "9c45ead4395ae80bc9a047f0a8474acc3ef93992"
 
@@ -153,7 +155,7 @@ describe("message", () => {
     const res = await getMessage(
       env,
       {
-        getMostRecentDeployInfo: createTestHeroku({ isRollback: false }),
+        getMostRecentDeployInfo: createTestHeroku(),
       },
       fakeGitHub(null),
       getCurrentDate,
@@ -210,7 +212,7 @@ describe("message", () => {
           },
           "text": Object {
             "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
-      5 commits, +142 -23 lines",
+      5 commits with 142 additions and 23 deletions",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -253,7 +255,6 @@ describe("message", () => {
       env,
       {
         getMostRecentDeployInfo: createTestHeroku({
-          isRollback: false,
           noChangesToDeploy: true,
         }),
       },
@@ -350,7 +351,7 @@ describe("message", () => {
           },
           "text": Object {
             "text": "*Acacia* — <https://github.com/ghost/Acacia/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
-      5 commits, +142 -23 lines",
+      5 commits with 142 additions and 23 deletions",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -398,7 +399,7 @@ describe("message", () => {
           },
           "text": Object {
             "text": "*Altair* — <https://github.com/ghost/altair/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
-      5 commits, +142 -23 lines",
+      5 commits with 142 additions and 23 deletions",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -441,9 +442,7 @@ describe("message", () => {
     const noChangesRes = await getMessage(
       env,
       {
-        getMostRecentDeployInfo: createTestHeroku({
-          isRollback: false,
-        }),
+        getMostRecentDeployInfo: createTestHeroku(),
       },
       fakeGitHub({
         ...fakeGithubResponse,
@@ -471,7 +470,7 @@ describe("message", () => {
           },
           "text": Object {
             "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
-      1 commit, +142 -23 lines",
+      1 commit with 142 additions and 23 deletions",
             "type": "mrkdwn",
           },
           "type": "section",
@@ -486,6 +485,74 @@ describe("message", () => {
             Object {
               "emoji": true,
               "text": "1 author",
+              "type": "plain_text",
+            },
+          ],
+          "type": "context",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "text": "environments: <https://staging.example.com| staging>, <https://prod.example.com| production>
+      last deployed: <https://github.com/ghost/time-to-deploy/commit/a8f68d19a290ad8a7eb19019de6ca58cecb444ce/|a8f68d1> Today at 4:11 p.m. (Nov 27, 2019)
+      ",
+              "type": "mrkdwn",
+            },
+          ],
+          "type": "context",
+        },
+      ]
+    `)
+  })
+
+  test("singular addition & deletion", async () => {
+    const noChangesRes = await getMessage(
+      env,
+      {
+        getMostRecentDeployInfo: createTestHeroku(),
+      },
+      fakeGitHub({
+        ...fakeGithubResponse,
+        additions: 1,
+        deletions: 1,
+      }),
+      getCurrentDate,
+    )
+
+    expect(noChangesRes).toMatchInlineSnapshot(`
+      Array [
+        Object {
+          "accessory": Object {
+            "text": Object {
+              "emoji": true,
+              "text": "Promote Staging 🚢",
+              "type": "plain_text",
+            },
+            "type": "button",
+            "url": "https://dashboard.heroku.com/pipelines/time%20to%20deploy%20project",
+          },
+          "text": Object {
+            "text": "*Time To Deploy Project* — <https://github.com/ghost/time-to-deploy/compare/a8f68d19a290ad8a7eb19019de6ca58cecb444ce...9c45ead4395ae80bc9a047f0a8474acc3ef93992|diff (_staging..production_)>
+      5 commits with 1 addition and 1 deletion",
+            "type": "mrkdwn",
+          },
+          "type": "section",
+        },
+        Object {
+          "elements": Array [
+            Object {
+              "alt_text": "chdsbd",
+              "image_url": "https://avatars.githubusercontent.com/u/1929960",
+              "type": "image",
+            },
+            Object {
+              "alt_text": "sbdchd",
+              "image_url": "https://avatars.githubusercontent.com/u/7340772",
+              "type": "image",
+            },
+            Object {
+              "emoji": true,
+              "text": "2 authors",
               "type": "plain_text",
             },
           ],
