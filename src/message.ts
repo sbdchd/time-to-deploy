@@ -66,14 +66,20 @@ function getDiffText({
   readonly diffUrl: string | null
   readonly comparison: Comparison
 }): string {
-  const commitsMessage =
-    comparison != null
-      ? `\n${comparison.totalCommits} ${pluralize(
-          "commit",
-          comparison.totalCommits,
-        )}, +${comparison.additions} -${comparison.deletions} lines`
-      : ""
   if (diffUrl && hasChanges) {
+    const commitsMessage =
+      comparison != null
+        ? `\n${comparison.totalCommits} ${pluralize(
+            "commit",
+            comparison.totalCommits,
+          )} with ${comparison.additions} ${pluralize(
+            "addition",
+            comparison.additions,
+          )} and ${comparison.deletions} ${pluralize(
+            "deletion",
+            comparison.deletions,
+          )}`
+        : ""
     return ` — <${diffUrl}|diff (_staging..production_)>${commitsMessage}`
   }
   if (hasChanges) {
