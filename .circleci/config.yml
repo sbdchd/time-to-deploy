@@ -3,7 +3,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/python:3.9-node
+      - image: circleci/node:12.4.0
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -21,12 +21,12 @@ jobs:
             - ./node_modules
           key: time-to-deploy-cache-v1-{{ checksum "yarn.lock" }}
       - run:
-          name: run typechecker
+          name: run tests
           command: ./s/test
 
   lint:
     docker:
-      - image: circleci/python:3.9-node
+      - image: circleci/node:12.4.0
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
