@@ -3,7 +3,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/node:12.4.0
+      - image: circleci/python:3.9-node
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -26,7 +26,7 @@ jobs:
 
   lint:
     docker:
-      - image: circleci/node:12.4.0
+      - image: circleci/python:3.9-node
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -48,7 +48,7 @@ jobs:
 
   build:
     docker:
-      - image: circleci/node:12.4.0
+      - image: circleci/python:3.9-node
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
