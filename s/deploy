@@ -2,8 +2,36 @@
 set -o errexit
 set -o nounset
 
+
+readonly SENTRY_PROJECT_SLUG="time-to-deploy"
+
 main() {
-    aws lambda update-function-code --function-name time-to-deploy --zip-file "fileb://$PWD/deploy.zip"
+    release_name="$(git rev-parse head)"
+
+    echo "starting sentry release"
+
+    ./node_modules/.bin/sentry-cli releases \
+        --project "${SENTRY_PROJECT_SLUG}" \
+        new "${release_name}"
+
+    ./node_modules/.bin/sentry-cli releases \
+        --project "${SENTRY_PROJECT_SLUG}" \
+        files "${release_name}" \
+        upload-sourcemaps ./build
+
+    echo "uploading code"
+
+    aws lambda update-function-code \
+        --function-name time-to-deploy \
+        --zip-file "fileb://${PWD}/deploy.zip" \
+        --no-cli-pager
+
+    echo "finalizing sentry release"
+
+    ./node_modules/.bin/sentry-cli releases \
+        finalize "${release_name}"
+
+    echo "done"
 }
 
 main "$@"
