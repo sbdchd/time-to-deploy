@@ -25,7 +25,7 @@ def main() -> None:
         help="release name used for in Sentry, usually a git sha",
     )
     args = parser.parse_args()
-    release_name = args.release
+    release_name: str = args.release
 
     if not os.getenv("SENTRY_ORG"):
         logger.info("missing required env var: SENTRY_ORG")

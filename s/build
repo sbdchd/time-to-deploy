@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import subprocess
 import argparse
 import logging
@@ -17,7 +19,7 @@ def main() -> None:
         help="release name used for in Sentry, usually a git sha",
     )
     args = parser.parse_args()
-    release_name = args.release
+    release_name: str = args.release
 
     logging.info("removing old deploy zip & clearing build dir")
 
