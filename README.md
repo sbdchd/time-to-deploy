@@ -86,6 +86,12 @@ This Slack bot provides info about Heroku deployments including:
    `SENTRY_ORG= s/deploy`. If you didn't name your lambda function `time-to-deploy`, be
    sure to update the `s/deploy` script before running it.
 
+   ```sh
+   release=$(git rev-parse head)
+   s/build "${release}"
+   SENTRY_ORG= s/deploy "${release}"
+   ```
+
 ### Test the Function
 
 Run the function and ensure the deploy message appears in your Slack channel.
