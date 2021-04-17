@@ -2,6 +2,8 @@
 
 > Slack bot for reminding about Heroku deployments
 
+<img alt="slack example message" width="600" src="./docs/example-message.png" />
+
 ## Why
 
 Using a `/remind` works in Slack but info is lacking. The Heroku dashboard
