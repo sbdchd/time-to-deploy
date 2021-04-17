@@ -6,17 +6,20 @@
 
 ## Why
 
-Using a `/remind` works in Slack but info is lacking. The Heroku dashboard
-also doesn't show a diff between prod and staging when there was a rollback.
+Using a [reminder in Slack](https://slack.com/help/articles/208423427-Set-a-reminder)
+works, but can't show dynamic content about current deployments. Also, for
+some reason, the Heroku dashboard doesn't show a diff between prod and
+staging when there was a rollback.
 
-This Slack bot provides info about Heroku deployments including:
+### Features
 
 - diff between staging and production
 - current commit on production
 - when code was last deployed to production
-- info on whether the last deploy was a rollback
-- promotion button from staging to prod
+- warning when last deploy was a rollback
+- [promotion](https://devcenter.heroku.com/articles/pipelines#promoting) button from staging to prod
 - links to staging and production envs
+- deployment info updates on deploy
 
 ## Setup Up
 
@@ -87,6 +90,12 @@ This Slack bot provides info about Heroku deployments including:
 8. Now we need to update our function with the actual code. Run `s/build` and
    `s/deploy`. If you didn't name your lambda function `time-to-deploy`, be
    sure to update the `s/deploy` script before running it.
+
+9. Setup an API Gateway so external HTTP requests can trigger the lambda.
+
+10. Hookup [Heroku post deploy
+    hooks](https://devcenter.heroku.com/articles/deploy-hooks#http-post-hook)
+    for each env of the apps to the API Gateway.
 
 ### Test the Function
 
