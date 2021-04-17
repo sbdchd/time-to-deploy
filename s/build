@@ -1,17 +1,69 @@
-#!/bin/sh
-set -o errexit
-set -o nounset
+#!/usr/bin/env python3
+from __future__ import annotations
 
-main() {
-    echo "removing old deploy zip & clearing build dir"
-    rm -rf build
-    rm -f deploy.zip
-    echo "compiling source files"
-    ./node_modules/.bin/esbuild src/index.ts --platform=node --bundle --minify --sourcemap --target=node12 --outfile=build/index.js
-    echo "zipping source files"
-    zip --recurse-paths --junk-paths --quiet deploy.zip build/index.js
-    du -h deploy.zip
-    echo "done"
-}
+import subprocess
+import argparse
+import logging
+import os
+import shutil
+from contextlib import suppress
 
-main "$@"
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__file__)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="build time-to-deploy")
+    parser.add_argument(
+        "release",
+        type=str,
+        help="release name used for in Sentry, usually a git sha",
+    )
+    args = parser.parse_args()
+    release_name: str = args.release
+
+    logging.info("removing old deploy zip & clearing build dir")
+
+    shutil.rmtree("build", ignore_errors=True)
+    with suppress(FileNotFoundError):
+        os.remove("deploy.zip")
+
+    logging.info("compiling source files for release: %s", release_name)
+
+    subprocess.run(
+        [
+            "./node_modules/.bin/esbuild",
+            "src/index.ts",
+            "--platform=node",
+            f"--define:process.env.TTD_SENTRY_RELEASE='{release_name}'",
+            "--bundle",
+            "--minify",
+            "--sourcemap",
+            "--target=node12",
+            "--outfile=build/index.js",
+        ],
+        check=True,
+        capture_output=True,
+    )
+
+    logging.info("zipping source files")
+    subprocess.run(
+        [
+            "zip",
+            "--recurse-paths",
+            "--junk-paths",
+            "--quiet",
+            "deploy.zip",
+            "build/index.js",
+        ],
+        check=True,
+        capture_output=True,
+    )
+
+    res = subprocess.run(["du", "-h", "deploy.zip"], check=True, capture_output=True)
+    logging.info("total size: %s", res.stdout.decode().strip())
+    logging.info("done")
+
+
+if __name__ == "__main__":
+    main()

@@ -21,7 +21,7 @@ jobs:
             - ./node_modules
           key: time-to-deploy-cache-v1-{{ checksum "yarn.lock" }}
       - run:
-          name: run typechecker
+          name: run tests
           command: ./s/test
 
   lint:
@@ -48,7 +48,7 @@ jobs:
 
   build:
     docker:
-      - image: circleci/node:12.4.0
+      - image: circleci/python:3.9-node
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -66,7 +66,7 @@ jobs:
           key: time-to-deploy-cache-v1-{{ checksum "yarn.lock" }}
       - run:
           name: build
-          command: ./s/build
+          command: ./s/build fake-release-name
 
   shellcheck:
     docker:

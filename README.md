@@ -85,8 +85,14 @@ This Slack bot provides info about Heroku deployments including:
    channel ID from the Slack URL. Don't forget to save your changes.
 
 8. Now we need to update our function with the actual code. Run `s/build` and
-   `s/deploy`. If you didn't name your lambda function `time-to-deploy`, be
+   `SENTRY_ORG= s/deploy`. If you didn't name your lambda function `time-to-deploy`, be
    sure to update the `s/deploy` script before running it.
+
+   ```sh
+   release=$(git rev-parse head)
+   s/build "${release}"
+   SENTRY_ORG= s/deploy "${release}"
+   ```
 
 ### Test the Function
 

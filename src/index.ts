@@ -10,7 +10,9 @@ import { isLeft } from "fp-ts/lib/Either"
 import { PathReporter } from "io-ts/lib/PathReporter"
 import * as Sentry from "@sentry/node"
 
-Sentry.init()
+Sentry.init({
+  release: process.env.TTD_SENTRY_RELEASE,
+})
 
 dotenv.config()
 

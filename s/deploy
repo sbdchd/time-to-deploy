@@ -1,9 +1,93 @@
-#!/bin/sh
-set -o errexit
-set -o nounset
+#!/usr/bin/env python3
+from __future__ import annotations
 
-main() {
-    aws lambda update-function-code --function-name time-to-deploy --zip-file "fileb://$PWD/deploy.zip"
-}
+import sys
+import argparse
+import logging
+import os
+import subprocess
 
-main "$@"
+SENTRY_PROJECT_SLUG = "time-to-deploy"
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__file__)
+
+
+PWD = os.getcwd()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="build time-to-deploy")
+    parser.add_argument(
+        "release",
+        type=str,
+        help="release name used for in Sentry, usually a git sha",
+    )
+    args = parser.parse_args()
+    release_name: str = args.release
+
+    if not os.getenv("SENTRY_ORG"):
+        logger.info("missing required env var: SENTRY_ORG")
+        sys.exit(1)
+
+    logging.info("starting sentry release for: %s", release_name)
+
+    subprocess.run(
+        [
+            "./node_modules/.bin/sentry-cli",
+            "releases",
+            "--project",
+            SENTRY_PROJECT_SLUG,
+            "new",
+            release_name,
+        ],
+        check=True,
+        capture_output=True,
+    )
+
+    subprocess.run(
+        [
+            "./node_modules/.bin/sentry-cli",
+            "releases",
+            "--project",
+            SENTRY_PROJECT_SLUG,
+            "files",
+            release_name,
+            "upload-sourcemaps",
+            "./build",
+        ],
+        check=True,
+        capture_output=True,
+    )
+
+    logging.info("uploading code")
+
+    subprocess.run(
+        [
+            "aws",
+            "lambda",
+            "update-function-code",
+            "--function-name",
+            "time-to-deploy",
+            "--zip-file",
+            f"fileb://{PWD}/deploy.zip",
+            "--no-cli-pager",
+        ],
+        check=True,
+        capture_output=True,
+    )
+
+    logging.info("finalizing sentry release")
+
+    subprocess.run(
+        ["./node_modules/.bin/sentry-cli", "releases", "finalize", release_name],
+        check=True,
+        capture_output=True,
+    )
+
+    logging.info("done")
+
+
+if __name__ == "__main__":
+    main()
