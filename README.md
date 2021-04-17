@@ -2,9 +2,7 @@
 
 > Slack bot for reminding about Heroku deployments
 
-![some-image](./docs/example-message.png)
-
-<img alt="slack example message" width="600" style="border-radius: 5px" src="./docs/example-message.png" />
+<img alt="slack example message" width="600" src="./docs/example-message.png" />
 
 ## Why
 
