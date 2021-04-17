@@ -6,6 +6,7 @@ import { Slack } from "./slack"
 import { DB } from "./db"
 import { log } from "./logging"
 import { addWeeks, getUnixTime } from "date-fns"
+import { assertNever } from "./assert"
 
 export async function main({
   slack,
@@ -91,6 +92,8 @@ export async function main({
       })
 
       log.info("updated slack message", result)
+    } else {
+      assertNever(eventInfo)
     }
   } catch (e) {
     log.warn("Problem sending message to slack", e)
