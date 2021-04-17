@@ -4,6 +4,8 @@
 
 ![some-image](./docs/example-message.png)
 
+<img alt="slack example message" width="600" style="border-radius: 5px" src="./docs/example-message.png" />
+
 ## Why
 
 Using a `/remind` works in Slack but info is lacking. The Heroku dashboard
