@@ -3,7 +3,10 @@ set -o errexit
 set -o nounset
 
 main() {
-    aws lambda update-function-code --function-name time-to-deploy --zip-file "fileb://$PWD/deploy.zip"
+    aws lambda update-function-code \
+      --function-name time-to-deploy \
+      --zip-file "fileb://$PWD/deploy.zip" \
+      --no-cli-pager
 }
 
 main "$@"
