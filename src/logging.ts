@@ -4,7 +4,7 @@ import * as Sentry from "@sentry/node"
 import * as t from "io-ts"
 import { isRight } from "fp-ts/lib/These"
 import omit from "lodash/omit"
-export const log = bunyan.createLogger({ name: "main" })
+const baselogger = bunyan.createLogger({ name: "main" })
 
 const BunyanChunk = t.type({
   name: t.string,
@@ -27,7 +27,53 @@ function getOrElse<T>(a: t.Validation<T>, def: T): T {
   return def
 }
 
-log.addStream({
+type LogContext = Record<string, unknown>
+
+class CustomLogger {
+  logger: bunyan
+  constructor(logger: bunyan) {
+    this.logger = logger
+  }
+  private log(
+    type: "info" | "warn" | "error",
+    contextOrMessage: LogContext | string,
+    context?: LogContext,
+  ): void {
+    if (typeof contextOrMessage === "object") {
+      baselogger[type](contextOrMessage)
+      return
+    }
+    if (typeof context != null) {
+      baselogger[type](context, contextOrMessage)
+      return
+    }
+    baselogger[type](contextOrMessage)
+  }
+  info(context: LogContext): void
+  info(message: string, context?: LogContext): void
+  info(contextOrMessage: LogContext | string, context?: LogContext): void {
+    this.log("info", contextOrMessage, context)
+  }
+
+  warn(context: LogContext): void
+  warn(message: string, context?: LogContext): void
+  warn(contextOrMessage: LogContext | string, context?: LogContext): void {
+    this.log("warn", contextOrMessage, context)
+  }
+
+  error(context: LogContext): void
+  error(message: string, context?: LogContext): void
+  error(contextOrMessage: LogContext | string, context?: LogContext): void {
+    this.log("error", contextOrMessage, context)
+  }
+  child(context: LogContext): CustomLogger {
+    return new CustomLogger(this.logger.child(context))
+  }
+}
+
+export const log = new CustomLogger(baselogger)
+
+baselogger.addStream({
   level: "debug",
   stream: new Writable({
     write(c: string, _encoding, next) {

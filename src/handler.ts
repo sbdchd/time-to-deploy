@@ -66,13 +66,13 @@ export async function main({
         if (isRight(res)) {
           log.info("saved message id")
         } else {
-          log.info("problem saving message", res.left)
+          log.info("problem saving message", { left: res.left })
         }
       } else {
         log.info("problem parsing slack response info")
       }
 
-      log.info("Sent message to slack", result)
+      log.info("Sent message to slack", { result })
     } else if (eventInfo.kind === "api_call") {
       log.info("handling api_call event")
       if (eventInfo.authToken !== HTTP_AUTH_TOKEN) {
@@ -95,8 +95,8 @@ export async function main({
     } else {
       assertNever(eventInfo)
     }
-  } catch (e) {
-    log.warn("Problem sending message to slack", e)
+  } catch (e: unknown) {
+    log.warn("Problem sending message to slack", { e })
   }
 }
 

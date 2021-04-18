@@ -59,7 +59,7 @@ async function createAccessTokenForInstall({
     },
   })
   if (isLeft(res)) {
-    log.warn("problem generating access token", installId)
+    log.warn("problem generating access token", { installId })
     return res
   }
   return res
@@ -125,7 +125,7 @@ export function createGitHubClient({
       token: jwt,
     })
     if (isLeft(tokenRes)) {
-      log.warn("failed to create access token", tokenRes)
+      log.warn("failed to create access token", { tokenRes })
       return null
     }
     const token: string = tokenRes.right.token
@@ -138,7 +138,7 @@ export function createGitHubClient({
       },
     })
     if (isLeft(res)) {
-      log.warn("failed to compare commit shas", res)
+      log.warn("failed to compare commit shas", { res })
       return null
     }
 

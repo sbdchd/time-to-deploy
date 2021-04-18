@@ -58,7 +58,7 @@ export function createHerokuClient(token: string) {
       },
     })
     if (isLeft(releasesRes)) {
-      log.warn("problem parsing release info", envName)
+      log.warn("problem parsing release info", { envName })
       return releasesRes
     }
 
@@ -82,7 +82,7 @@ export function createHerokuClient(token: string) {
       },
     })
     if (isLeft(slugRes)) {
-      log.warn("problem parsing slug res", envName)
+      log.warn("problem parsing slug res", { envName })
       return slugRes
     }
 

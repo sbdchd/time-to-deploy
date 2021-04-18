@@ -37,7 +37,7 @@ export async function handler(event: unknown) {
   const env = EnvShape.decode(process.env)
 
   if (isLeft(env)) {
-    log.error({ violations: PathReporter.report(env) }, "problem parsing env")
+    log.error("problem parsing env", { violations: PathReporter.report(env) })
     return
   }
 
