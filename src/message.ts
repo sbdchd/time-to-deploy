@@ -298,13 +298,7 @@ function getProjectSettings(env: { readonly TTD_PROJECT_SETTINGS: string }) {
   if (isRight(parsedResult)) {
     return parsedResult.right
   }
-  log.error(
-    `Problem parsing project settings: ${JSON.stringify(
-      { res: parsedResult.left },
-      null,
-      2,
-    )}`,
-  )
+  log.error("Problem parsing project settings", { res: parsedResult.left })
   throw Error("problem parsing project settings")
 }
 
@@ -327,7 +321,7 @@ async function getLastDeploy({
     envName,
   })
   if (isLeft(res)) {
-    log.warn("failed to get recent deploy info", envName)
+    log.warn("failed to get recent deploy info", { envName })
     return null
   }
   return res.right
@@ -344,7 +338,7 @@ async function getStagingSha({
     envName,
   })
   if (isLeft(res)) {
-    log.warn("failed to get staging sha", envName)
+    log.warn("failed to get staging sha", { envName })
     return null
   }
   return res.right.sha

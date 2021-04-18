@@ -4,7 +4,7 @@ import * as Sentry from "@sentry/node"
 import * as t from "io-ts"
 import { isRight } from "fp-ts/lib/These"
 import omit from "lodash/omit"
-export const log = bunyan.createLogger({ name: "main" })
+const baselogger = bunyan.createLogger({ name: "main" })
 
 const BunyanChunk = t.type({
   name: t.string,
@@ -27,7 +27,62 @@ function getOrElse<T>(a: t.Validation<T>, def: T): T {
   return def
 }
 
-log.addStream({
+type LogContext = Record<string, unknown>
+
+class CustomLogger {
+  logger: bunyan
+  constructor(logger: bunyan) {
+    this.logger = logger
+  }
+  info(context: LogContext): void
+  info(message: string, context?: LogContext): void
+  info(contextOrMessage: LogContext | string, context?: LogContext): void {
+    if (typeof contextOrMessage === "object") {
+      baselogger.info(contextOrMessage)
+      return
+    }
+    if (typeof context != null) {
+      baselogger.info(context, contextOrMessage)
+      return
+    }
+    baselogger.info(contextOrMessage)
+  }
+
+  warn(context: LogContext): void
+  warn(message: string, context?: LogContext): void
+  warn(contextOrMessage: LogContext | string, context?: LogContext): void {
+    if (typeof contextOrMessage === "object") {
+      baselogger.warn(contextOrMessage)
+      return
+    }
+    if (typeof context != null) {
+      baselogger.warn(context, contextOrMessage)
+      return
+    }
+    baselogger.warn(contextOrMessage)
+  }
+
+  error(context: LogContext): void
+  error(message: string, context?: LogContext): void
+  error(contextOrMessage: LogContext | string, context?: LogContext): void {
+    if (typeof contextOrMessage === "object") {
+      baselogger.error(contextOrMessage)
+      return
+    }
+    if (typeof context != null) {
+      baselogger.error(context, contextOrMessage)
+      return
+    }
+    baselogger.error(contextOrMessage)
+  }
+  child(context: LogContext): CustomLogger {
+    return new CustomLogger(this.logger.child(context))
+  }
+}
+
+export const log = new CustomLogger(baselogger)
+
+baselogger.addStream({
   level: "debug",
   stream: new Writable({
     write(c: string, _encoding, next) {
