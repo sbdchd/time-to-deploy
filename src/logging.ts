@@ -34,46 +34,37 @@ class CustomLogger {
   constructor(logger: bunyan) {
     this.logger = logger
   }
-  info(context: LogContext): void
-  info(message: string, context?: LogContext): void
-  info(contextOrMessage: LogContext | string, context?: LogContext): void {
+  private log(
+    type: "info" | "warn" | "error",
+    contextOrMessage: LogContext | string,
+    context?: LogContext,
+  ): void {
     if (typeof contextOrMessage === "object") {
-      baselogger.info(contextOrMessage)
+      baselogger[type](contextOrMessage)
       return
     }
     if (typeof context != null) {
-      baselogger.info(context, contextOrMessage)
+      baselogger[type](context, contextOrMessage)
       return
     }
-    baselogger.info(contextOrMessage)
+    baselogger[type](contextOrMessage)
+  }
+  info(context: LogContext): void
+  info(message: string, context?: LogContext): void
+  info(contextOrMessage: LogContext | string, context?: LogContext): void {
+    this.log("info", contextOrMessage, context)
   }
 
   warn(context: LogContext): void
   warn(message: string, context?: LogContext): void
   warn(contextOrMessage: LogContext | string, context?: LogContext): void {
-    if (typeof contextOrMessage === "object") {
-      baselogger.warn(contextOrMessage)
-      return
-    }
-    if (typeof context != null) {
-      baselogger.warn(context, contextOrMessage)
-      return
-    }
-    baselogger.warn(contextOrMessage)
+    this.log("warn", contextOrMessage, context)
   }
 
   error(context: LogContext): void
   error(message: string, context?: LogContext): void
   error(contextOrMessage: LogContext | string, context?: LogContext): void {
-    if (typeof contextOrMessage === "object") {
-      baselogger.error(contextOrMessage)
-      return
-    }
-    if (typeof context != null) {
-      baselogger.error(context, contextOrMessage)
-      return
-    }
-    baselogger.error(contextOrMessage)
+    this.log("error", contextOrMessage, context)
   }
   child(context: LogContext): CustomLogger {
     return new CustomLogger(this.logger.child(context))
