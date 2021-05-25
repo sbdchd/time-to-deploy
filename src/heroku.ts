@@ -2,9 +2,10 @@ import { http } from "./http"
 
 import * as t from "io-ts"
 import * as et from "io-ts/Type"
-import { Either, isLeft, right } from "fp-ts/lib/Either"
+import { Either, isLeft, right, left } from "fp-ts/lib/Either"
 import { AxiosError } from "axios"
 import { log } from "./logging"
+import { withFallback } from "io-ts-types/lib/withFallback"
 
 const HerokuReleaseResponseShape = t.array(
   t.type({
@@ -15,7 +16,15 @@ const HerokuReleaseResponseShape = t.array(
     }),
     created_at: t.string,
     description: t.string,
-    status: t.string,
+    status: withFallback(
+      t.union([
+        t.literal("failed"),
+        t.literal("pending"),
+        t.literal("succeeded"),
+        t.literal("unknown"),
+      ]),
+      "unknown",
+    ),
     id: t.string,
     slug: t.type({
       id: t.string,
@@ -52,7 +61,7 @@ export function createHerokuClient(token: string) {
       method: "GET",
       shape: HerokuReleaseResponseShape,
       headers: {
-        Range: "id; order=desc,max=1",
+        Range: "id; order=desc,max=20",
         Accept: "application/vnd.heroku+json; version=3",
         Authorization: `Bearer ${token}`,
       },
@@ -62,13 +71,15 @@ export function createHerokuClient(token: string) {
       return releasesRes
     }
 
-    const releaseJson = releasesRes.right
-    const mostRecentSlugId = releaseJson[0].slug.id
-    const createdAt = releaseJson[0].updated_at
-    const deployerEmail = releaseJson[0].user.email
-    const isRollback = releaseJson[0].description
-      .toLowerCase()
-      .includes("rollback")
+    const deploy = releasesRes.right.find(x => x.status === "succeeded")
+    if (deploy == null) {
+      return left(Error("problem finding successful deploy"))
+    }
+
+    const mostRecentSlugId = deploy.slug.id
+    const createdAt = deploy.updated_at
+    const deployerEmail = deploy.user.email
+    const isRollback = deploy.description.toLowerCase().includes("rollback")
 
     const slugRes = await http({
       url: `https://api.heroku.com/apps/${envName}/slugs/${mostRecentSlugId}/`,
