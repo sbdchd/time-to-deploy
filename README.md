@@ -72,30 +72,44 @@ staging when there was a rollback.
 3. Leave the "Author from scratch" section selected & fill out the function
    name with `time-to-deploy`. The default nodejs version is fine. Press "Create Function"
 
-4. In the "Designer" panel press the "+ Add trigger" button and select "CloudWatch Events".
+4. At your lambda function's homepage, click "Copy ARN" and save the value for later.
 
-5. create a new rule giving it a name, this is going to be the cron that runs the deploy reminder.
+5. Under "Configuration", edit the "General Configuration" to provide 512MB of RAM and 30 second timeout.
 
-6. in the schedule expression input `cron(30 14 ? * MON-FRI *)` which will run the job
+6. At the function homepage, press the "+ Add trigger" button and select "CloudWatch Events".
+
+7. create a new rule giving it a name, this is going to be the cron that runs the deploy reminder.
+
+8. in the schedule expression input `cron(30 14 ? * MON-FRI *)` which will run the job
    every weekday at 14:00 UTC. see
    <https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html>
    for more info on the cron format. Hit the add trigger button.
 
-7. Back at the function detail page scroll down to the env and input the env
+9. [Create a Dynamodb table](https://console.aws.amazon.com/dynamodbv2/home#create-table) with the table name `time-to-deploy` and the partition key as `pk`.
+
+10. [Create a new IAM policy](https://console.aws.amazon.com/iam/home#/policies$new?step=edit) to give read and write access to the dynamodb table. Select `DynamoDB` as the Service. Under Actions, enable `GetItem` under the Read section and `PutItem` in the Write section. Under Resources, add your lambda's ARN you copied earlier.
+
+11. [Find the IAM Role](https://console.aws.amazon.com/iamv2/home#/roles) coresponding to the lambda function. It should start with `time-to-deploy-role`. CLick "Attach Policies", then select your newly created IAM policy.
+
+12. Back at the function detail page scroll down to the env and input the env
    vars according to the `.env-example` file located in this repo. Use the
    previous OAuth Acess Token that starts with `xoxp-` as the
    `TTD_SLACK_API_TOKEN`. For the `TTD_SLACK_CHANNEL_ID` you'll want to get the
    channel ID from the Slack URL. Don't forget to save your changes.
 
-8. Now we need to update our function with the actual code. Run `s/build` and
+13. Now we need to update our function with the actual code. Run `s/build` and
    `s/deploy`. If you didn't name your lambda function `time-to-deploy`, be
    sure to update the `s/deploy` script before running it.
 
-9. Setup an API Gateway so external HTTP requests can trigger the lambda.
+14. Setup an API Gateway so external HTTP requests can trigger the lambda. Click "+ trigger" on the function homepage and create an `HTTP API` with `open security`. Navigate back to your lambda function homepage and click the new "API Gateway" trigger and copy the API endpoint URL. Append `?auth_token=your_http_auth_token_here` to the URL and configure it as a Heroku deploy hook for all of your Heroku apps.
 
-10. Hookup [Heroku post deploy
+- "+ trigger", create api, http api, open security. go back to the lambda function homepage, click the new "API Gateway" trigger, copy the API endpoint URL and append "?auth_token=your_auth_token_here" to the URL to use as a Heroku deploy hook. The URL should look like: `https://e478006295.execute-api.us-east-1.amazonaws.com/default/time-to-deploy?auth_token=your-http-secret-here`
+
+15. Hookup [Heroku post deploy
     hooks](https://devcenter.heroku.com/articles/deploy-hooks#http-post-hook)
     for each env of the apps to the API Gateway.
+
+16. Optionally set a SENTRY_DSN in your environment variables to get Sentry error reports.
 
 ### Test the Function
 
