@@ -89,17 +89,17 @@ staging when there was a rollback.
 
 10. [Create a new IAM policy](https://console.aws.amazon.com/iam/home#/policies$new?step=edit) to give read and write access to the dynamodb table. Select `DynamoDB` as the Service. Under Actions, enable `GetItem` under the Read section and `PutItem` in the Write section. Under Resources, add your lambda's ARN you copied earlier.
 
-11. [Find the IAM Role](https://console.aws.amazon.com/iamv2/home#/roles) coresponding to the lambda function. It should start with `time-to-deploy-role`. CLick "Attach Policies", then select your newly created IAM policy.
+11. [Find the IAM Role](https://console.aws.amazon.com/iamv2/home#/roles) corresponding to the lambda function. It should start with `time-to-deploy-role`. Click "Attach Policies", then select your newly created IAM policy.
 
 12. Back at the function detail page scroll down to the env and input the env
-   vars according to the `.env-example` file located in this repo. Use the
-   previous OAuth Acess Token that starts with `xoxp-` as the
-   `TTD_SLACK_API_TOKEN`. For the `TTD_SLACK_CHANNEL_ID` you'll want to get the
-   channel ID from the Slack URL. Don't forget to save your changes.
+    vars according to the `.env-example` file located in this repo. Use the
+    previous OAuth Acess Token that starts with `xoxp-` as the
+    `TTD_SLACK_API_TOKEN`. For the `TTD_SLACK_CHANNEL_ID` you'll want to get the
+    channel ID from the Slack URL. Don't forget to save your changes.
 
 13. Now we need to update our function with the actual code. Run `s/build` and
-   `s/deploy`. If you didn't name your lambda function `time-to-deploy`, be
-   sure to update the `s/deploy` script before running it.
+    `s/deploy`. If you didn't name your lambda function `time-to-deploy`, be
+    sure to update the `s/deploy` script before running it.
 
 14. Setup an API Gateway so external HTTP requests can trigger the lambda. Click "+ trigger" on the function homepage and create an `HTTP API` with `open security`. Navigate back to your lambda function homepage and click the new "API Gateway" trigger and copy the API endpoint URL. Append `?auth_token=your_http_auth_token_here` to the URL and configure it as a Heroku deploy hook for all of your Heroku apps.
 
